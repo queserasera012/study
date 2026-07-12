@@ -189,11 +189,18 @@ h2{font-size:1.1rem;font-weight:900;margin-bottom:10px}
 .stp:active{transform:scale(.92)}
 .stp.sel{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,201,77,.3);background:var(--card)}
 .stMoko{width:76px;height:76px;margin:0 auto;display:block}
+/* ---------- なかま(おとも) ---------- */
+.bud2{font-size:1.5rem;margin-left:-6px;transform:translateY(4px)}
+.bud3{font-size:2.2rem;margin-bottom:14px}
+.gitem{position:relative;border:2px solid var(--line);background:var(--card);cursor:pointer;font-family:inherit;color:var(--ink)}
+.gitem.bud{border-color:var(--acc);box-shadow:0 0 0 3px rgba(255,201,77,.28)}
+.kira{position:absolute;right:4px;top:2px;font-size:.9rem}
+.budtag{position:absolute;left:4px;top:4px;background:var(--acc);color:var(--btnink);font-size:.55rem;font-weight:900;padding:1px 6px;border-radius:999px}
 /* ---------- しまの道(ホーム) ---------- */
 .isleHd{display:flex;align-items:center;gap:8px;margin:22px 2px 2px}
 .isleHd b{font-size:.95rem;font-weight:900}
 .isleHd .ln{flex:1;height:2px;background:var(--line);border-radius:2px}
-.isle{position:relative;width:100%;max-width:360px;margin:0 auto}
+.isle{position:relative;width:100%}
 /* --- 背景(空・雲・海・山・森) --- */
 .isleBg{position:absolute;inset:0;overflow:hidden;border-radius:26px;z-index:0;
  border:2px solid var(--line);background:linear-gradient(180deg,var(--sky1),var(--sky2) 62%)}
@@ -219,8 +226,8 @@ h2{font-size:1.1rem;font-weight:900;margin-bottom:10px}
  .bgWave2{animation:wroll 22s linear infinite reverse}
  .bgLum{animation:lumpulse 6s ease-in-out infinite}
 }
-@keyframes cdrift{from{transform:translateX(0)}to{transform:translateX(460px)}}
-@keyframes wroll{from{transform:translateX(0)}to{transform:translateX(-360px)}}
+@keyframes cdrift{from{transform:translateX(0)}to{transform:translateX(660px)}}
+@keyframes wroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes lumpulse{0%,100%{opacity:.85}50%{opacity:1}}
 .isle .trail{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1}
 .inode{position:absolute;transform:translate(-50%,-50%);width:80px;height:80px;z-index:2;
@@ -392,6 +399,98 @@ const CHJR=[
  {q:"🍎🍎🍎 と 🍊🍊 おおいのは どっち?",c:["りんご","みかん","おなじ"],a:0,x:"りんごは 3こ、みかんは 2こ。3のほうが おおきいね"},
  {q:"ふうせんを はなすと どうして うえに とんでいくの?",c:["くうきより かるい ガスが はいっているから","かぜが ふくから","ふうせんが げんきだから"],a:0,x:"ふわふわの ふうせんには くうきより かるい ガスが はいっているから うかぶんだよ"}
 ];
+/* ================= data: kotoba(ことわざ・熟語・慣用句) ================= */
+const KOTOBA=[
+ {l:1,b:"🐕",q:"「〇も歩けば 棒に当たる」 〇に入る どうぶつは?",c:["犬","猫","馬"],x:"出歩けば 思いがけないこと(良いことも!)に出会う、ということわざ"},
+ {l:1,b:"🐴",q:"「〇の耳に 念仏」",c:["馬","牛","犬"],x:"いくら言っても 聞く気がない人には むだ、というたとえ"},
+ {l:1,b:"🐱",q:"「〇に 小判」",c:["猫","犬","豚"],x:"どんなに立派なものも、価値がわからない人には むだ、という意味"},
+ {l:1,b:"🐢",q:"「〇の甲より 年の功」",c:["亀","蟹","貝"],x:"年上の人の経験は 貴重だ、という意味。亀は長生きの象徴だね"},
+ {l:1,b:"🐒",q:"「〇も木から落ちる」",c:["猿","鳥","りす"],x:"木登り名人の猿でも落ちる=名人でも失敗することがある"},
+ {l:1,b:"🐝",q:"「泣きっ面に〇」",c:["蜂","蚊","雨"],x:"泣いている顔を さらに蜂が刺す=不運が重なること"},
+ {l:1,b:"🐸",q:"「井の中の〇 大海を知らず」",c:["蛙","魚","亀"],x:"せまい世界しか知らないと、広い世界のことがわからない、という意味"},
+ {l:1,b:"🐦",q:"「〇の行水(ぎょうずい)」",c:["烏(からす)","雀","鳩"],x:"お風呂に入る時間が とても短いこと。カラスの水浴びは あっという間!"},
+ {l:1,b:"🐷",q:"「〇に真珠」",c:["豚","猫","犬"],x:"「猫に小判」と同じ意味。値打ちのわからない人に 高価なものをあげても むだ"},
+ {l:1,b:"🦗",q:"「飛んで火に入る 夏の〇」",c:["虫","鳥","星"],x:"自分から危険にとびこむこと。夜の虫が 明かりに集まる様子から"},
+ {l:1,b:"🐦",q:"「〇の一声(ひとこえ)」",c:["鶴","鷹","鶏"],x:"えらい人のひとことで ものごとが決まること"},
+ {l:1,b:"🐎",q:"「〇が合う」= 気が合う",c:["馬","犬","猫"],x:"乗り手と馬の呼吸がぴったり合う様子から。「あの子とは馬が合う」と使うよ"},
+ {l:2,b:"⛰️",q:"「ちりも積もれば 山となる」の意味は?",c:["小さなことも 積み重なれば 大きくなる","山には ごみが多い","そうじは たいへん"],x:"1日1問でも、毎日つづければ 大きな力になる。まなびクエストの精神!"},
+ {l:2,b:"🪨",q:"「石の上にも三年」の意味は?",c:["がまん強くつづければ 成果が出る","石は三年で あたたまる","すわりつづけるのは 体に悪い"],x:"冷たい石も3年すわれば あたたまる。つらくても続けることが大切、という意味"},
+ {l:2,b:"🔄",q:"「急がば回れ」の意味は?",c:["急ぐときこそ 安全な道を選べ","走ると 速い","回り道は 楽しい"],x:"あわてて近道して失敗するより、確実な道のほうが 結局早い"},
+ {l:2,b:"💪",q:"「七転び八起き」の意味は?",c:["何度失敗しても 立ち上がる","転ぶのは 8回まで","転んだら 休む"],x:"7回転んでも8回起きる。失敗しても あきらめない心のこと"},
+ {l:2,b:"🐰",q:"「二兎(にと)を追う者は 一兎をも得ず」は?",c:["よくばると 両方とも 手に入らない","うさぎは 2羽で かう","走れば 2羽つかまえられる"],x:"2羽のうさぎを同時に追うと、1羽もつかまらない。ひとつに集中しよう"},
+ {l:2,b:"💊",q:"「良薬(りょうやく)は口に苦し」の意味は?",c:["ためになる注意は 聞くのがつらい","苦い薬ほど 高い","あまい薬は きかない"],x:"よく効く薬が苦いように、自分のためになる忠告ほど 耳が痛いもの"},
+ {l:2,b:"👀",q:"「百聞(ひゃくぶん)は一見にしかず」は?",c:["100回聞くより 1回見るほうが わかる","たくさん聞くほうが よい","見ないほうが よい"],x:"人から聞くより、自分の目でたしかめるのが一番、という意味"},
+ {l:2,b:"🌅",q:"「早起きは三文(さんもん)の徳」の意味は?",c:["早起きすると いいことがある","朝は 3回おきる","ねぼうは 3文はらう"],x:"三文=むかしの少しのお金。早起きすると ちょっと得をするよ、という教え"},
+ {l:2,b:"🖌️",q:"「弘法(こうぼう)にも筆のあやまり」は?",c:["名人でも 失敗することがある","字は ていねいに書け","筆は 大切にしろ"],x:"書の名人・弘法大師でも書きまちがえる。「猿も木から落ちる」と同じ意味だよ"},
+ {l:2,b:"🏮",q:"「灯台もと暗し」の意味は?",c:["身近なことほど 気づきにくい","灯台は 暗い","夜は 明かりが いる"],x:"さがしものが 意外と目の前にあった、なんてこと あるよね。それが灯台もと暗し"},
+ {l:2,b:"🍡",q:"「花より団子」の意味は?",c:["きれいなものより 役に立つもの","花は 食べられる","団子は 花のかざり"],x:"お花見なのに 花より団子に夢中。風流より実利を選ぶことのたとえ"},
+ {l:2,b:"🫘",q:"「まかぬ種は生えぬ」の意味は?",c:["何もしなければ 結果は出ない","種は まくと 生える","畑仕事は たいへん"],x:"種をまかなければ芽は出ない。努力なしに成果はない、ということ"},
+ {l:3,b:"🐤",q:"四字熟語「一石二〇」 〇は?",c:["鳥","魚","貝"],x:"一石二鳥=ひとつの行動で ふたつの利益を得ること。1つの石で2羽の鳥を落とす、から"},
+ {l:3,b:"🎨",q:"四字熟語「十人十〇」 〇は?",c:["色","人","家"],x:"十人十色=人はそれぞれ 考えも好みも ちがう、という意味"},
+ {l:3,b:"💭",q:"四字熟語「以心伝〇」 〇は?",c:["心","身","気"],x:"以心伝心=ことばにしなくても 気持ちが通じ合うこと"},
+ {l:3,b:"🖼️",q:"四字熟語「自〇自賛」 〇は?",c:["画","分","作"],x:"自画自賛=自分で描いた絵を自分でほめる=自分のことを自分でほめること"},
+ {l:3,b:"⚡",q:"四字熟語「電光石〇」 〇は?",c:["火","光","水"],x:"電光石火=いなずまや火花のように、動きがすばやいこと"},
+ {l:3,b:"🗣️",q:"四字熟語「異口同〇」 〇は?",c:["音","口","声"],x:"異口同音=みんなが口をそろえて 同じことを言うこと"},
+ {l:3,b:"🍵",q:"「一期一会(いちごいちえ)」の意味は?",c:["一生に一度の 大切な出会い","一年に一回 会う","いちごを 食べる会"],x:"この出会いは二度とないかもしれない。だから今を大切に、というお茶の心から生まれた言葉"},
+ {l:3,b:"📚",q:"「温故知新(おんこちしん)」の意味は?",c:["古いことから 新しい学びを得る","古いものは あたためる","新しいものが いちばん"],x:"「故(ふる)きを温(たず)ねて新しきを知る」。歴史や昔の知恵から学ぶこと"},
+ {l:3,b:"🌗",q:"「明暗」のように 反対の意味の漢字を組み合わせた熟語は?",c:["上下","森林","読書"],x:"明⇔暗、上⇔下。「森林」は似た意味どうし、「読書」は「書を読む」の組み立てだよ"},
+ {l:3,b:"🌲",q:"「森林」のように 似た意味の漢字を組み合わせた熟語は?",c:["岩石","強弱","乗車"],x:"森も林も木がたくさん、岩も石も おなじなかま。組み立てがわかると熟語はこわくない"},
+ {l:3,b:"🚀",q:"「日進月歩(にっしんげっぽ)」の意味は?",c:["たえまなく どんどん進歩する","日と月は 歩く","毎月 進級する"],x:"日ごと月ごとに進歩する。テクノロジーの世界に ぴったりの言葉"},
+ {l:3,b:"⚠️",q:"「油断大敵(ゆだんたいてき)」の意味は?",c:["気をぬくことが いちばんの敵","油は こぼすな","敵は 大きい"],x:"「もうだいじょうぶ」と思ったときが 一番あぶない、といういましめ"},
+ {l:4,b:"👂",q:"「耳が痛い」の意味は?",c:["自分の弱点を言われて つらい","耳が びょうき","音が うるさい"],x:"体の慣用句は「本当の耳」の話じゃない。図星をさされて 聞くのがつらい、という意味"},
+ {l:4,b:"👃",q:"「鼻が高い」の意味は?",c:["ほこらしい","かぜを ひいた","においに 気づく"],x:"じまんしたい気持ち。「弟が優勝して 鼻が高い」のように使うよ"},
+ {l:4,b:"👄",q:"「口が堅(かた)い」の意味は?",c:["ひみつを もらさない","食べるのが おそい","声が 小さい"],x:"反対に、すぐしゃべっちゃう人は「口が軽い」だよ"},
+ {l:4,b:"🤝",q:"「手を貸す」の意味は?",c:["手伝う","にぎ手をする","手を あらう"],x:"「ちょっと手を貸して」=「ちょっと手伝って」。手そのものを貸すわけじゃないよ"},
+ {l:4,b:"🦵",q:"「足が棒になる」の意味は?",c:["歩きすぎて とてもつかれる","足が ながくなる","こけて けがをする"],x:"足がかたい棒みたいに感じるほど つかれた、というたとえ"},
+ {l:4,b:"👁️",q:"「目がない」の意味は?",c:["大好きで たまらない","目を つぶっている","見えにくい"],x:"「あまいものに目がない」=あまいものが大好き、という意味"},
+ {l:4,b:"😄",q:"「腹をかかえる」の意味は?",c:["大笑いする","おなかが いたい","おなかが すいた"],x:"おなかをかかえるほど 大笑いすること。「腹をかかえて笑う」と使うよ"},
+ {l:4,b:"😔",q:"「肩を落とす」の意味は?",c:["がっかりする","にもつが おもい","肩を たたく"],x:"がっかりすると 自然に肩が下がるよね。その様子からできた慣用句"},
+ {l:4,b:"😤",q:"「胸をはる」の意味は?",c:["自信をもって 堂々とする","しんこきゅうを する","むねが いたい"],x:"「テストをがんばったから 胸をはって帰ろう」のように使うよ"},
+ {l:4,b:"🔥",q:"「頭に来る」の意味は?",c:["おこる","いいことを 思いつく","ぼうしを かぶる"],x:"かっとなって おこること。血が頭にのぼる様子からだよ"}
+];
+/* ================= data: zatsugaku(ざつがく・みぢかな ふしぎ) ================= */
+const ZATSU=[
+ {l:1,b:"🚥",q:"しんごうの「すすめ」は なにいろ?",c:["あお","あか","きいろ"],x:"「みどり色じゃない?」そう、みどりに見えるけど 日本では「あお」とよぶんだ"},
+ {l:1,b:"🗻",q:"日本で いちばん高い山は?",c:["ふじさん","あそさん","たかおさん"],x:"高さ3776m。てんきのいい日は とおくからも見えるよ"},
+ {l:1,b:"🐼",q:"パンダの だいこうぶつは?",c:["ささ","にく","はちみつ"],x:"1日に10kg以上たべることも! ほとんど ささと竹だけで生きているんだ"},
+ {l:1,b:"🚒",q:"火事のとき かける電話ばんごうは?",c:["119","110","117"],x:"119は消防車と救急車。110はけいさつ。まちがえないでね"},
+ {l:1,b:"👮",q:"けいさつを よぶ電話ばんごうは?",c:["110","119","104"],x:"「ひゃくとおばん」とよばれるよ。こまったときは おとなの人といっしょに かけよう"},
+ {l:1,b:"🐭",q:"十二支(じゅうにし)の さいしょの どうぶつは?",c:["ねずみ","うし","とら"],x:"ね・うし・とら・う・たつ・み・うま・ひつじ・さる・とり・いぬ・い、の12こ"},
+ {l:1,b:"🍌",q:"バナナは 木になる? 草になる?",c:["草","木","つち の中"],x:"バナナの「木」に見えるのは じつは大きな草! かたい みきが ないんだ"},
+ {l:1,b:"🥚",q:"たまごの きみは ひよこの…?",c:["ごはん(えいよう)","おふとん","おもちゃ"],x:"きみは ひよこが育つための えいよう。しろみは まもるクッションだよ"},
+ {l:1,b:"🍜",q:"ラーメンは もともと どこの国の りょうり?",c:["ちゅうごく","にほん","アメリカ"],x:"中国のめん料理が 日本にきて、日本らしく へんしんしたんだ"},
+ {l:1,b:"✏️",q:"えんぴつの しんの ざいりょうは?",c:["こくえん と ねん土","すみ","くろい ペンキ"],x:"黒鉛(こくえん)というつぶを ねん土でかためている。Bや2Bは 黒鉛が多くて こいんだ"},
+ {l:1,b:"🫑",q:"ピーマンと パプリカは?",c:["おなじ なかま","べつの やさい","くだもの"],x:"どちらも とうがらしの なかま。パプリカのほうが あまくて 肉あつだよ"},
+ {l:1,b:"🐶",q:"犬が あついとき したを出すのは?",c:["体を ひやすため","おなかが すいたから","ねむいから"],x:"犬は あせを ほとんどかけない。したで ハアハアして 体の熱をにがすんだ"},
+ {l:1,b:"⚽",q:"サッカーは 1チーム なんにん?",c:["11にん","9にん","5にん"],x:"キーパーもいれて11人。やきゅうは9人、バスケは5人だよ"},
+ {l:1,b:"🌛",q:"月に うさぎが いるように見えるのは?",c:["もようが うさぎに見えるから","ほんとうに いるから","かがみだから"],x:"月の くらい部分のもようが うさぎのもちつきに見える、という言いつたえだよ"},
+ {l:2,b:"🗾",q:"日本の 都道府県は いくつ?",c:["47","50","30"],x:"1都(東京)・1道(北海道)・2府(大阪・京都)・43県で47!"},
+ {l:2,b:"🌊",q:"日本で いちばん大きい湖は?",c:["琵琶湖(びわこ)","富士五湖","摩周湖"],x:"滋賀県にあって、県の面積の6分の1が琵琶湖! 形が楽器の琵琶に似ているんだ"},
+ {l:2,b:"🏔️",q:"世界で いちばん高い山は?",c:["エベレスト","富士山","キリマンジャロ"],x:"高さ8849m。富士山の2倍以上! ヒマラヤ山脈にあるよ"},
+ {l:2,b:"🐋",q:"世界で いちばん大きい動物は?",c:["シロナガスクジラ","ゾウ","キリン"],x:"体長30m、バスの3台分! 大昔の恐竜より大きい、地球史上最大の動物なんだ"},
+ {l:2,b:"🐙",q:"タコの足は8本。では イカは?",c:["10本","8本","6本"],x:"イカは8本+ながい2本(しょくわん)で10本。ながい2本で えものを つかまえるよ"},
+ {l:2,b:"🏞️",q:"日本で いちばん長い川は?",c:["信濃川(しなのがわ)","利根川","石狩川"],x:"長野県から新潟県まで367km。長野では「千曲川(ちくまがわ)」とよばれるよ"},
+ {l:2,b:"🌍",q:"世界で いちばん長い川は?",c:["ナイル川","アマゾン川","ミシシッピ川"],x:"アフリカのナイル川は約6700km! 日本列島の2倍以上の長さだよ"},
+ {l:2,b:"🏅",q:"オリンピックは 何年ごとに ひらかれる?",c:["4年","2年","10年"],x:"夏と冬の大会が それぞれ4年ごと。2年ずらして 交互にやってくるよ"},
+ {l:2,b:"🐝",q:"はちみつを 作る虫は?",c:["ミツバチ","アリ","チョウ"],x:"1ぴきのミツバチが 一生で作るはちみつは ティースプーン1ぱいぶんだけ!"},
+ {l:2,b:"🐆",q:"りくで いちばん速い動物は?",c:["チーター","ライオン","ダチョウ"],x:"時速100km以上! でも 全力で走れるのは 数百mだけなんだ"},
+ {l:2,b:"🦴",q:"ほねが ない生きものは?",c:["タコ","ネコ","ヘビ"],x:"タコは ほねが1本もないから、せまい すきまも するりと通れるんだ"},
+ {l:2,b:"🦒",q:"キリンの ねむる時間は 1日どのくらい?",c:["とても短い(20分〜2時間)","12時間","8時間"],x:"立ったまま うとうと。てきに おそわれないように 深くは ねむらないんだ"},
+ {l:2,b:"🐦",q:"世界で いちばん小さい鳥は?",c:["ハチドリ","スズメ","ツバメ"],x:"いちばん小さい種類は 体重2gほど。1円玉2まいぶん! 花のみつを飛びながら すうよ"},
+ {l:2,b:"🍫",q:"チョコレートの 原料は?",c:["カカオのたね","コーヒーまめ","くろまめ"],x:"カカオの実の中のたねを はっこうさせて いって すりつぶすと チョコのもとになるよ"},
+ {l:3,b:"🐌",q:"カタツムリの歯は なんぼん?",c:["1まん本以上","32本","0本"],x:"「歯舌(しぜつ)」というおろし金みたいな歯がびっしり。世界一歯が多い生きものといわれるよ"},
+ {l:3,b:"🐙",q:"タコの心臓は いくつ?",c:["3つ","1つ","2つ"],x:"全身用1つ+えら用2つ。ちなみに血は 赤じゃなくて うすい青なんだ!"},
+ {l:3,b:"🍌",q:"バナナの 黒いてんてんは?",c:["あまくなった しるし","くさった しるし","虫くい"],x:"シュガースポットとよばれ、出てきたころが 一番あまい食べごろ!"},
+ {l:3,b:"🚀",q:"宇宙では 音は?",c:["聞こえない","大きく聞こえる","ひびく"],x:"音は空気のふるえ。空気のない宇宙では 爆発もサイレント。映画の宇宙の音は演出なんだ"},
+ {l:3,b:"⚡",q:"かみなりの温度は 太陽の表面より?",c:["熱い","つめたい","おなじ"],x:"かみなりは約3万度、太陽の表面は約6000度。一瞬だけど 太陽の5倍も熱い!"},
+ {l:3,b:"🐦",q:"うしろむきに飛べる鳥は?",c:["ハチドリ","ツバメ","タカ"],x:"1秒に50回以上はばたいて、ヘリコプターみたいに 前にも後ろにも 飛べるんだ"},
+ {l:3,b:"🐘",q:"ゾウが できない動きは?",c:["ジャンプ","およぐ","はしる"],x:"体が重すぎて 4本足が同時に地面からはなれることがない。でも泳ぎは得意!"},
+ {l:3,b:"🐠",q:"金魚の きおくは?",c:["数か月おぼえていられる","3秒でわすれる","1日でわすれる"],x:"「3秒でわすれる」はまちがい! えさの時間や飼い主を おぼえられるんだ"},
+ {l:3,b:"💧",q:"人の体の 約60%は?",c:["水分","ほね","きんにく"],x:"体重30kgなら 約18kgが水! だから水分ほきゅうは とても大事なんだ"},
+ {l:3,b:"😮",q:"しゃっくりの 正体は?",c:["横隔膜(おうかくまく)のけいれん","のどの ひめい","胃の ジャンプ"],x:"呼吸をたすける筋肉「横隔膜」が ピクッとけいれんして、声帯が急にとじる音なんだ"},
+ {l:3,b:"💅",q:"つめが速くのびるのは 手と足 どっち?",c:["手","足","おなじ"],x:"手のつめは足の2倍くらい速くのびる。よく使う指ほど速い、という説もあるよ"},
+ {l:3,b:"🗻",q:"富士山は 今も…?",c:["活火山","死火山","ただの山"],x:"最後の噴火は約300年前(宝永噴火)。今もかんそくがつづく、れっきとした活火山だよ"}
+];
 /* ================= data: gacha ================= */
 const GACHA=[
  {e:"🐣",n:"ぴよまる",r:"N"},{e:"🐢",n:"のろすけ",r:"N"},{e:"🐟",n:"ぎょぎょ",r:"N"},{e:"🍄",n:"きのこん",r:"N"},
@@ -449,7 +548,55 @@ const RIKA=[
  {l:4,b:"⚖️",q:"てこで小さい力で持ち上げるには 支点から力点を?",c:["遠くする","近くする","真上にする"],x:"支点〜力点が長いほど小さい力でOK。くぎぬきやはさみも てこの応用!"},
  {l:4,b:"🍳",q:"食塩水を熱して水をじょう発させると?",c:["とけていた食塩が出てくる","何ものこらない","水がふえる"],x:"とけた物は消えていないしょうこ。海水から塩を作るのも同じ方法"},
  {l:4,b:"🌀",q:"台風が生まれるのは 日本から見て どの方角の海?",c:["南","北","西"],x:"あたたかい南の海で、水じょう気のエネルギーをもらって生まれ、発達しながら北上してくる"},
- {l:4,b:"❤️",q:"心臓のはたらきは?",c:["血液を全身に送るポンプ","空気をためる","食べ物を消化する"],x:"1日に約10万回もはく動して、酸素や栄養を全身にとどけている働き者!"}
+ {l:4,b:"❤️",q:"心臓のはたらきは?",c:["血液を全身に送るポンプ","空気をためる","食べ物を消化する"],x:"1日に約10万回もはく動して、酸素や栄養を全身にとどけている働き者!"},
+ {l:1,b:"🌈",q:"にじは なんしょく?",c:["7しょく","3しょく","10しょく"],x:"あか・だいだい・き・みどり・あお・あい・むらさき の7つ。おひさまの光が雨つぶで分かれて見えるんだ"},
+ {l:1,b:"🐟",q:"魚は なにで いきをする?",c:["えら","はな","くち"],x:"えらで水の中の さんそを とりこむよ。だから水の外では くるしいんだ"},
+ {l:1,b:"🐸",q:"カエルの 子どもは?",c:["おたまじゃくし","こがえる","めだか"],x:"おたまじゃくしには しっぽがあって、育つと足が生えて しっぽが消えるよ"},
+ {l:1,b:"🌻",q:"ヒマワリの花は なにを むく?",c:["たいよう","つき","かぜ"],x:"わかいヒマワリは太陽をおいかけて向きを変える。日光がだいすきなんだ"},
+ {l:1,b:"🧊",q:"こおりが とけると なにになる?",c:["水","ゆげ","ゆき"],x:"こおりは水がひえてかたまったもの。あたたまると また水にもどるよ"},
+ {l:1,b:"🌕",q:"月が いちばん まるく見えるのは?",c:["まんげつ","みかづき","はんげつ"],x:"月は毎日すこしずつ形が変わって見える。ぜんぶ見えるのが まんげつ!"},
+ {l:1,b:"🐌",q:"カタツムリの からは?",c:["生まれたときから ある","あとから ひろう","ぬげる"],x:"からは体の一部で、生まれたときから ついているよ。ヤドカリとは ちがうんだ"},
+ {l:1,b:"🍂",q:"あきに はっぱの色が かわるのは?",c:["みどりの つぶが へるから","雨が ふるから","虫が たべるから"],x:"はっぱのみどりの正体「ようりょくたい」がへって、かくれていた きいろや赤が見えてくるんだ"},
+ {l:1,b:"⛅",q:"くもは なにで できている?",c:["小さな水のつぶ","わた","けむり"],x:"空にうかぶ小さな小さな水や氷のつぶのあつまり。おもくなると雨になって落ちてくるよ"},
+ {l:1,b:"🔦",q:"かげが できるのは 光が…?",c:["まっすぐ すすむから","まがるから","かるいから"],x:"光はまっすぐ進むので、ものに当たると そのうしろに光がとどかない場所=かげ ができるんだ"},
+ {l:1,b:"🦎",q:"トカゲの しっぽは きれても?",c:["また はえてくる","はえてこない","2本になる"],x:"てきにおそわれたとき、しっぽを切りはなして にげる。あとから新しいのが はえてくるよ"},
+ {l:1,b:"🐝",q:"ハチが 花から あつめるのは?",c:["みつ","水","たね"],x:"花のみつを あつめて はちみつを作る。そのとき花粉をはこんで 花のたすけもしているんだ"},
+ {l:2,b:"🌡️",q:"水が こおる おんどは?",c:["0度","10度","100度"],x:"0度で こおりはじめる。ぎゃくに100度で ふっとうして 水じょう気になるよ"},
+ {l:2,b:"♨️",q:"水が ふっとうする おんどは?",c:["100度","50度","0度"],x:"ぐつぐつ わきたつのが100度。やかんの口から出る白いゆげは 水じょう気が ひえたものだよ"},
+ {l:2,b:"🌇",q:"太陽が しずむ ほうがくは?",c:["西","東","北"],x:"太陽は東からのぼって西にしずむ。「日が西にかたむく」って言うね"},
+ {l:2,b:"⭐",q:"北極星が ある ほうがくは?",c:["北","南","西"],x:"北極星はほとんど動かないので、むかしの旅人は これで北をたしかめたんだ"},
+ {l:2,b:"🔔",q:"音は なにが ふるえて つたわる?",c:["空気","光","かげ"],x:"たいこをたたくと空気がふるえて、そのふるえが耳までとどく。だから宇宙では音が聞こえないよ"},
+ {l:2,b:"🧲",q:"じしゃくに くっつくのは?",c:["鉄","アルミニウム","ガラス"],x:"じしゃくにつくのは鉄など一部の金属だけ。10円玉(どう)や アルミかんは つかないよ"},
+ {l:2,b:"🕷️",q:"クモの 足は 何本?",c:["8本","6本","4本"],x:"こん虫は6本、クモは8本。だからクモは こん虫のなかまじゃないんだ"},
+ {l:2,b:"❤️",q:"しんぞうの やくめは?",c:["血をおくるポンプ","空気をすう","ごはんをとかす"],x:"1日に10まん回ちかく ドクドクはたらいて、血を体じゅうにとどけているよ"},
+ {l:2,b:"💨",q:"いきをすって とりこむのは?",c:["さんそ","ちっそ","水じょう気"],x:"体はさんそをつかってエネルギーを作る。いらなくなった二酸化炭素を はき出すよ"},
+ {l:2,b:"🌿",q:"植物が 光をあびて 出すのは?",c:["さんそ","二酸化炭素","けむり"],x:"植物は光合成でさんそを作ってくれる。森が「地球の肺」とよばれるのは このためだよ"},
+ {l:2,b:"🦴",q:"おとなの ほねは やく何本?",c:["やく200本","やく50本","やく1000本"],x:"赤ちゃんは300本くらいあって、育つうちに くっついて200本くらいになるんだ"},
+ {l:2,b:"🌊",q:"うみの水が しょっぱいのは?",c:["しおが とけているから","さとうが とけているから","つめたいから"],x:"長い年月をかけて岩のしおの成分が とけこんだんだ。なめてみると たしかに しょっぱい!"},
+ {l:3,b:"🍃",q:"光合成に ひつようなのは 日光と水と?",c:["二酸化炭素","さんそ","ちっそ"],x:"植物は日光・水・二酸化炭素からデンプン(栄養)とさんそを作る。これが光合成!"},
+ {l:3,b:"🥛",q:"つめたいコップの外側に 水てきがつくのは?",c:["空気中の水じょう気がひえたから","コップから水がしみ出たから","雨がふったから"],x:"目に見えない水じょう気がひやされて水にもどる。これを「けつろ」というよ"},
+ {l:3,b:"💡",q:"電気を とおすのは?",c:["金ぞく","ゴム","ガラス"],x:"鉄やどうなどの金ぞくは電気をとおす。ゴムやプラスチックは とおさないから コードのカバーに使われるよ"},
+ {l:3,b:"🌙",q:"月が 光って見えるのは?",c:["太陽の光をはねかえしている","自分で もえている","電気がついている"],x:"月は自分では光らない。太陽の光をはねかえして かがやいて見えるんだ"},
+ {l:3,b:"🌍",q:"地球が 太陽のまわりを 1しゅうするのは?",c:["1年","1日","1か月"],x:"これが「公転」。1しゅう=365日=1年。地球じしんが1回転するのは1日(自転)だよ"},
+ {l:3,b:"🌀",q:"台風の「目」って なに?",c:["中心の 雲がすくない ところ","一番 風が強い ところ","雨が一番ふる ところ"],x:"ぐるぐる回る雲の中心は、ふしぎと風がおだやか。でも目のまわりが 一番はげしいんだ"},
+ {l:3,b:"🍎",q:"食物れんさの スタートは?",c:["植物","ライオン","人間"],x:"植物→草食動物→肉食動物 とつながる。はじまりは太陽の光で育つ植物なんだ"},
+ {l:3,b:"👅",q:"だ液(つば)の やくめは?",c:["食べものを 消化しはじめる","あじを つくる","歯を とかす"],x:"だ液にはデンプンを分解する はたらきがある。よくかむと あまく感じるのは そのせい!"},
+ {l:3,b:"🌡️",q:"温度計の 赤い液が 上がるのは?",c:["あたたまると ふくらむから","かるくなるから","にげたいから"],x:"液はあたためると体積がふえる(ぼうちょう)。そのぶん細い管を のぼっていくんだ"},
+ {l:3,b:"🪨",q:"かせきから わかるのは?",c:["大むかしの 生きもののこと","あしたの 天気","うみの ふかさ"],x:"きょうりゅうの ほねや あしあとの かせきから、大むかしの生きものの すがたが わかるんだ"},
+ {l:4,b:"🍋",q:"さんせいの 水よう液は どれ?",c:["レモンのしる","せっけん水","食塩水"],x:"すっぱいものは だいたい さんせい。せっけん水はアルカリせい、食塩水は中せいだよ"},
+ {l:4,b:"⏱️",q:"ふりこが 1往復する時間を かえるのは?",c:["ひもの長さ","おもりの重さ","ふれはば"],x:"重さやふれはばを変えても時間は同じ。ひもを長くすると ゆっくりになる。ガリレオの大発見!"},
+ {l:4,b:"🧲",q:"電磁石を 強くするには?",c:["コイルのまき数を ふやす","電池を へらす","しんを 木にする"],x:"まき数をふやす・電流を強くする・鉄しんを入れる、の3つで強くなるよ"},
+ {l:4,b:"⚖️",q:"てこで 小さい力で持ち上げるには?",c:["力点を 支点から とおくする","力点を 支点に ちかづける","ぼうを みじかくする"],x:"支点から力点までが長いほど、小さな力ですむ。くぎぬきや はさみも てこの なかまだよ"},
+ {l:4,b:"🌌",q:"空気中に いちばん多い気体は?",c:["ちっそ","さんそ","二酸化炭素"],x:"じつは やく78%が ちっそ。さんそは やく21%しかないんだ"},
+ {l:4,b:"🔥",q:"ものが もえるのに ひつような気体は?",c:["さんそ","ちっそ","水じょう気"],x:"さんそが なくなると火は消える。ろうそくに コップをかぶせる実験で たしかめられるよ"},
+ {l:4,b:"🌋",q:"火山から ふき出す どろどろの岩は?",c:["よう岩","おんせん","つち"],x:"地下のマグマが地上に出たものが よう岩。ひえてかたまると 新しい岩や島になるんだ"},
+ {l:4,b:"🌗",q:"月の 満ち欠けが ひとまわりするのは?",c:["やく30日","やく7日","やく365日"],x:"新月→半月→満月→…と やく29.5日でひとまわり。「ひと月」のもとになったリズムだよ"},
+ {l:4,b:"🌱",q:"たねの 発芽に ひつようなのは 水・空気と?",c:["てきとうな温度","日光","土"],x:"じつは日光と土はなくても芽は出る! 水・空気・温度の3つが そろえばいいんだ"},
+ {l:4,b:"🩸",q:"血液を 全身におくり出す じゅんばんは?",c:["心ぞう→どうみゃく→体","体→心ぞう→どうみゃく","どうみゃく→心ぞう→体"],x:"心ぞうから出る血管が「どうみゃく」、もどる血管が「じょうみゃく」だよ"},
+ {l:4,b:"🐦",q:"わたり鳥が きせつで 移動するのは?",c:["すごしやすい場所と食べものをもとめて","たいくつだから","地図がすきだから"],x:"何千kmも飛ぶ鳥もいる。太陽や星、地球のじばを たよりに進むと考えられているよ"},
+ {l:4,b:"🧬",q:"子が親に にるのは なぜ?",c:["親から せいしつを 受けつぐから","おなじ家に すむから","おなじものを 食べるから"],x:"生きものは「いでん」で親のとくちょうを受けつぐ。目の色も 背の高さも そのひとつ"},
+ {l:2,b:"🐧",q:"ペンギンは なにの なかま?",c:["鳥","魚","けもの"],x:"とべないけど りっぱな鳥。羽毛があって たまごをうむよ。水の中を「とぶ」ように泳ぐんだ"},
+ {l:1,b:"🌧️",q:"雨が やんだあと にじが出やすいのは?",c:["太陽の反対がわ","太陽のすぐそば","足もと"],x:"太陽をせなかにして立つと、前の空の雨つぶが光を分けて にじが見えるよ"},
 ];
 /* ================= data: chie ================= */
 const SHP=[["🔺","さんかく"],["⚪","まる"],["🟦","しかく"],["⭐","ほし"],["❤️","はーと"]];
@@ -471,7 +618,9 @@ const SUBJ={
  rika:{n:'りか',pl:'りかの湖',max:4},
  hira:{n:'ひらがな',pl:'ひらがな草原',max:5},
  kazu:{n:'かず',pl:'かずのはま',max:5},
- chie:{n:'ちえあそび',pl:'ちえの洞くつ',max:3}
+ chie:{n:'ちえあそび',pl:'ちえの洞くつ',max:3},
+ kotoba:{n:'ことば',pl:'ことばの丘',max:4},
+ zatsugaku:{n:'ざつがく',pl:'はてなの灯台',max:3}
 };
 const SCHEMA_VERSION=3;
 const SRS=[1,3,7,14,30];
@@ -501,20 +650,20 @@ function answersToday(p){const L=p.log[today()];return (L&&L.a)||0;}
 function srsInterval(st){return SRS[Math.min(st,SRS.length)-1]||30;}
 /* 学年帯プリセット: 教科セット・初期レベル・セッション長・自動読み上げ */
 const GRADES={
- kinder:{label:'ようちえん',subs:{hira:1,kazu:1,eigo:1,chie:1},caps:{eigo:3},len:6,autoRead:true},
- g12:{label:'小1・小2',subs:{kanji:1,math:1,hira:3,eigo:1,chie:1},len:7,autoRead:false},
- g34:{label:'小3・小4',subs:{kanji:2,math:3,eigo:1,rika:1},len:8,autoRead:false},
- g56:{label:'小5・小6',subs:{kanji:4,math:5,eigo:2,rika:2},len:8,autoRead:false}
+ kinder:{label:'ようちえん',subs:{hira:1,kazu:1,eigo:1,chie:1,zatsugaku:1},caps:{eigo:3,zatsugaku:2},len:6,autoRead:true},
+ g12:{label:'小1・小2',subs:{kanji:1,math:1,hira:3,eigo:1,chie:1,kotoba:1,zatsugaku:1},len:7,autoRead:false},
+ g34:{label:'小3・小4',subs:{kanji:2,math:3,eigo:1,rika:1,kotoba:1,zatsugaku:1},len:8,autoRead:false},
+ g56:{label:'小5・小6',subs:{kanji:4,math:5,eigo:2,rika:2,kotoba:2,zatsugaku:2},len:8,autoRead:false}
 };
 function uuid(){try{if(crypto&&crypto.randomUUID)return crypto.randomUUID();}catch(e){}return 'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);}
-function newSubject(level,cap){const o={level:level||1,recent:[],miss:{},items:{},placement:true};if(cap)o.max=cap;return o;}
+function newSubject(level,cap){const o={level:level||1,recent:[],miss:{},items:{},placement:true,lastUp:''};if(cap)o.max=cap;return o;}
 function newProfile(name,emoji,theme,grade){
  const g=GRADES[grade]||GRADES.g34;
  const subjects={};
  for(const sk in g.subs)subjects[sk]=newSubject(g.subs[sk],(g.caps&&g.caps[sk])||null);
  return {name:name||'なかま',emoji:emoji||'⭐',theme:theme||'adventure',grade:grade||'g34',
    coins:0,xp:0,streak:0,lastPlayed:'',sessionLen:g.len,autoRead:!!g.autoRead,lock:null,
-   collection:{},subjects:subjects,log:{},reports:[],inbox:[],charms:0,weekClaim:'',coinCap:null,lastBackup:'',created:today()};
+   collection:{},subjects:subjects,log:{},reports:[],inbox:[],charms:0,weekClaim:'',coinCap:null,buddy:null,flower:0,lastBackup:'',created:today()};
 }
 /* 出荷時は なかまゼロ。名前は購入者の家庭が最初に入力する(他人の家族構成を同梱しない) */
 function defState(){
@@ -538,6 +687,7 @@ function migrate(){
  if(S.appLock===undefined)S.appLock=null;
  if(S.coinCap===undefined)S.coinCap=COIN_CAP;
  if(!S.family)S.family={name:'',flower:0};
+ if(S.family.legacy===undefined)S.family.legacy=S.family.flower||0; // 更新前の花は端末の「これまでのぶん」として保持
  if(S.lastSeen===undefined)S.lastSeen='';
  // 各プロファイルに不足フィールドを補完(後方互換)
  for(const id of S.order){
@@ -547,6 +697,8 @@ function migrate(){
    if(p[k]===undefined)p[k]=dfl[k];
   if(p.weekClaim===undefined)p.weekClaim='';
   if(p.coinCap===undefined)p.coinCap=null;
+  if(p.buddy===undefined)p.buddy=null;
+  if(p.flower===undefined)p.flower=0;
   for(const k of ['collection','log','reports','inbox'])if(!p[k])p[k]=dfl[k];
   if(p.lock===undefined)p.lock=null;
   if(!p.grade)p.grade='g34';
@@ -554,12 +706,16 @@ function migrate(){
   if(!p.created)p.created=today();
   if(p.lastBackup===undefined)p.lastBackup='';
   if(!p.subjects)p.subjects={};
+  // 新教科(ことば・ざつがく)を学年帯にあわせて自動追加(既存教科には触れない)
+  const gc=GRADES[p.grade];
+  if(gc){for(const sk in gc.subs){if(!p.subjects[sk])p.subjects[sk]=newSubject(gc.subs[sk],(gc.caps&&gc.caps[sk])||null);}}
   for(const sk in p.subjects){
    const sb=p.subjects[sk];
    if(!sb.recent)sb.recent=[];
    if(!sb.miss)sb.miss={};
    if(!sb.items)sb.items={};
    if(sb.placement===undefined)sb.placement=false; // 既存ユーザーは実力が既に反映済みとみなす
+   if(sb.lastUp===undefined)sb.lastUp='';
   }
  }
  S.version=SCHEMA_VERSION;
@@ -692,8 +848,14 @@ function genMath(lv){
    let g3=15;while(ws.size<3&&g3--){const s=fmt(nh,(nm+5+R(50))%60);if(s!==ans)ws.add(s);}
    return mkChoice(ans,[...ws].slice(0,3),h+'時'+m+'分の '+add+'分後は?','🕐','時こく','60分たつと 1時間くり上がるよ');
   }
-  const a=100+R(800),b=11+R(80);
-  return nIn(a+' × '+b+' = ?',a*b,'かけ算(3けた×2けた)','筆算で1だんずつ。位をそろえてね');
+  /* 3けた×2けた(例:847×63)は学校では筆算で解く内容で、暗算の範囲外。
+     タブレットでは紙が無いので、暗算の作戦が存在する形だけを出す。 */
+  if(Math.random()<.5){
+   const a=12+R(78),b=[20,30,40,50][R(4)];
+   return nIn(a+' × '+b+' = ?',a*b,'かけ算(×何十)','×'+b+'は「×'+(b/10)+'をして 10倍」。'+a+'×'+(b/10)+'='+(a*b/10)+' → '+(a*b));
+  }
+  const a=(2+R(8))*100,b=2+R(8);
+  return nIn(a+' × '+b+' = ?',a*b,'かけ算(何百×1けた)',(a/100)+'×'+b+'='+(a*b/100)+' の 100倍、と考えると九九でとける!');
  }
  if(lv===5){
   const c=pickCat(['word','box']);
@@ -835,10 +997,32 @@ function genEigo(lv){
  const it=EW[R(EW.length)];
  return {type:'input',big:it[2]+'「'+it[1]+'」',text:'えいごで タイピングしてね',a:it[0],en:true,key:it[0],x:it[0]+'('+it[3]+')。つづりは「音」とセットでおぼえると強い!',ph:'abc'};
 }
-function genRika(lv){
- let pool=RIKA.filter(r=>r.l===lv);
- if(Math.random()<.3){const p2=RIKA.filter(r=>r.l<=lv);if(p2.length)pool=p2;}
- const it=pool[R(pool.length)];
+/* バンク出題の共通ピッカー: 「見たことがない問題 → いちばん昔に見た問題」を優先する。
+   同じ問題がすぐ出て飽きる、を根本から防ぐ(問題単位の履歴を使う)。 */
+function pickBank(list,lv,p,subjKey){
+ let pool=list.filter(r=>r.l===lv);
+ if(Math.random()<.3){const p2=list.filter(r=>r.l<=lv);if(p2.length)pool=p2;}
+ if(p&&p.subjects&&p.subjects[subjKey]){
+  const items=p.subjects[subjKey].items||{};
+  const scored=pool.map(it=>({it,seen:(items[it.id]&&items[it.id].last)||''}));
+  scored.sort((a,b)=>a.seen<b.seen?-1:a.seen>b.seen?1:0); // ''(未出題)が先頭、次に古い順
+  const unseenN=scored.filter(x=>!x.seen).length;
+  // 未出題が3問以上のこっているうちは、未出題からだけ出す
+  const take=unseenN>=3?unseenN:Math.max(3,Math.ceil(scored.length*0.4));
+  return scored[R(Math.min(take,scored.length))].it;
+ }
+ return pool[R(pool.length)];
+}
+function genRika(lv,p){
+ const it=pickBank(RIKA,lv,p,'rika');
+ return mkChoice(it.c[0],it.c.slice(1),it.q,it.b,it.id,it.x);
+}
+function genKotoba(lv,p){
+ const it=pickBank(KOTOBA,lv,p,'kotoba');
+ return mkChoice(it.c[0],it.c.slice(1),it.q,it.b,it.id,it.x);
+}
+function genZatsu(lv,p){
+ const it=pickBank(ZATSU,lv,p,'zatsugaku');
  return mkChoice(it.c[0],it.c.slice(1),it.q,it.b,it.id,it.x);
 }
 function genChie(lv){
@@ -866,12 +1050,14 @@ function genChie(lv){
  const third=SHP.filter(s=>s[0]!==a[0]&&s[0]!==b2[0])[0][0];
  return mkChoice(nxt,[wrong,third],'つぎに くるのは どれ?',pat.join(' ')+' ❓','ならびのきそく','ならびかたの きまりを みつけよう!');
 }
-function genQ(subj,lv){
+function genQ(subj,lv,p){
  if(subj==='kanji')return genKanji(lv);
  if(subj==='math')return genMath(lv);
  if(subj==='hira')return genHira(lv);
  if(subj==='eigo')return genEigo(lv);
- if(subj==='rika')return genRika(lv);
+ if(subj==='rika')return genRika(lv,p);
+ if(subj==='kotoba')return genKotoba(lv,p);
+ if(subj==='zatsugaku')return genZatsu(lv,p);
  if(subj==='chie')return genChie(lv);
  return genKazu(lv);
 }
@@ -879,14 +1065,17 @@ function genQ(subj,lv){
    固定バンク item には一意の id を付与し itemKey に用いる(文言修正しても履歴が切れないように)。
    生成型(gen)は key にカテゴリ名を用いる(カテゴリ単位の習熟が取れる)。 */
 RIKA.forEach((it,i)=>{if(!it.id)it.id='rika-'+String(i+1).padStart(3,'0');});
+KOTOBA.forEach((it,i)=>{if(!it.id)it.id='kotoba-'+String(i+1).padStart(3,'0');});
+ZATSU.forEach((it,i)=>{if(!it.id)it.id='zatsu-'+String(i+1).padStart(3,'0');});
 const BANKS={
- rika:{type:'bank',items:RIKA},
+ rika:{type:'bank',items:RIKA}, kotoba:{type:'bank',items:KOTOBA}, zatsugaku:{type:'bank',items:ZATSU},
  kanji:{type:'gen',fn:genKanji}, math:{type:'gen',fn:genMath}, eigo:{type:'gen',fn:genEigo},
  hira:{type:'gen',fn:genHira}, kazu:{type:'gen',fn:genKazu}, chie:{type:'gen',fn:genChie}
 };
 /* 親レポート等で itemKey を読みやすい文言に変換 */
 function bankLabel(subject,key){
- if(subject==='rika'){const it=RIKA.find(r=>r.id===key);return it?it.q.slice(0,14):key;}
+ const bk=BANKS[subject];
+ if(bk&&bk.type==='bank'){const it=bk.items.find(r=>r.id===key);return it?it.q.slice(0,14):key;}
  return key;
 }
 function genSession(p,subj){
@@ -895,7 +1084,7 @@ function genSession(p,subj){
  let guard=0;
  while(qs.length<p.sessionLen&&guard<200){
   guard++;
-  const q=genQ(subj,lv);q.subj=subj;
+  const q=genQ(subj,lv,p);q.subj=subj;
   const sig=q.key+'|'+(q.big||'')+'|'+q.text;
   if(used[sig])continue;
   used[sig]=1;qs.push(q);
@@ -922,8 +1111,9 @@ function weakItemsOf(p){
 /* keyを実際の問題に。rikaは同一問を再現、生成教科は同教科・同レベルで新規生成(近似復習)。 */
 function questionFor(p,subject,key,src){
  let q=null;
- if(subject==='rika'){const it=RIKA.find(r=>r.id===key);if(it)q=mkChoice(it.c[0],it.c.slice(1),it.q,it.b,it.id,it.x);}
- if(!q)q=genQ(subject,p.subjects[subject].level);
+ const bk=BANKS[subject];
+ if(bk&&bk.type==='bank'){const it=bk.items.find(r=>r.id===key);if(it)q=mkChoice(it.c[0],it.c.slice(1),it.q,it.b,it.id,it.x);}
+ if(!q)q=genQ(subject,p.subjects[subject].level,p);
  q.subj=subject;q.src=src;return q;
 }
 /* ミッションの内訳は必ずここから導く(表示と出題の食い違いを防ぐ単一の真実) */
@@ -953,7 +1143,7 @@ function buildMission(p){
  fill(due,s.nReview,'review');
  fill(weak,s.nWeak,'weak');
  let guard=0,ri=R(subs.length);
- while(qs.length<s.len&&guard++<300){const sk=subs[(ri++)%subs.length];const q=genQ(sk,p.subjects[sk].level);q.subj=sk;q.src='new';add(q);}
+ while(qs.length<s.len&&guard++<300){const sk=subs[(ri++)%subs.length];const q=genQ(sk,p.subjects[sk].level,p);q.subj=sk;q.src='new';add(q);}
  return shuf(qs);
 }
 function missionStatus(p){
@@ -1014,7 +1204,7 @@ function handleAns(ok){
  const L=p.log[t];L.a++;if(ok)L.c++;
  if(!L.s[sk])L.s[sk]={a:0,c:0};
  L.s[sk].a++;if(ok)L.s[sk].c++;
- if(S.family)S.family.flower=(S.family.flower||0)+(ok?1:0);
+ if(ok)p.flower=(p.flower||0)+1; // かぞくの木の花は本人に記録(端末をまたいで合流できるように)
  save();render();
  const bd=document.getElementById('buddy');
  if(bd&&ok){bd.classList.add('happy');}
@@ -1050,6 +1240,7 @@ function nextQ(){
 }
 function finishS(){
  const p=curP(),quiz=V.quiz;
+ const t=today();
  const acc=quiz.correct/quiz.qs.length;
  if(acc>=1){quiz.coins+=3;}
  if(!quiz.mission){
@@ -1059,7 +1250,15 @@ function finishS(){
    const s=sb.recent.reduce((a,b)=>a+b,0);
    const upT=sb.placement?win:7, dnT=sb.placement?1:3;
    let moved=false;
-   if(s>=upT&&sb.level<mx){sb.level++;sb.recent=[];quiz.lvMsg='up';moved=true;SFX.lvup();}
+   if(s>=upT&&sb.level<mx){
+    /* レベルアップは1教科につき1日1回まで(実力判定モードは除外)。
+       1日で駆け上がる→難問だらけ→挫折、を防ぐ。窓は保持して翌日に持ちこす。 */
+    if(sb.placement||sb.lastUp!==t){
+     sb.level++;sb.recent=[];sb.lastUp=t;quiz.lvMsg='up';moved=true;SFX.lvup();
+    }else{
+     quiz.lvMsg='soon';
+    }
+   }
    else if(s<=dnT&&sb.level>1){sb.level--;sb.recent=[];quiz.lvMsg=sb.placement?'find':'down';moved=true;}
    if(sb.placement){
     sb._noMove=moved?0:((sb._noMove||0)+1);
@@ -1071,7 +1270,6 @@ function finishS(){
   if(!p.mission||p.mission.date!==today()){quiz.coins+=5;quiz.missionFirst=true;}
   p.mission={date:today(),done:true};
  }
- const t=today();
  // --- 1日のコイン上限(遊ぶこと自体は止めない。コインだけ止まる) ---
  const L=p.log[t]||(p.log[t]={a:0,c:0,s:{}});
  const room=Math.max(0,effCap(p)-(L.k||0));
@@ -1167,8 +1365,13 @@ function svgFamilyTree(fl){
  }
  return '<svg class="ftree" viewBox="0 0 160 140" aria-hidden="true">'+ground+inner+'</svg>';
 }
+function familyTotal(){
+ let t=(S.family&&S.family.legacy)||0;
+ for(const id of S.order){const pr=S.profiles[id];if(pr)t+=pr.flower||0;}
+ return t;
+}
 function familyTreeCard(){
- const fl=(S.family&&S.family.flower)||0;
+ const fl=familyTotal();
  const s=treeStage(fl), nx=treeNext(fl);
  let h='<div class="ftcard">';
  h+=svgFamilyTree(fl);
@@ -1231,13 +1434,18 @@ function doGacha(){
  const g=pool[R(pool.length)];
  const id=g.e;
  let dup=false;
- if(p.collection[id]){dup=true;p.coins+=5;}
+ if(p.collection[id]){dup=true;p.coins+=5;p.collection[id]++;} // 2回目からは キラ(✨)に進化
  else p.collection[id]=1;
  SFX.gacha();
  V.gres={g:g,dup:dup};
  save();render();
 }
 function closeG(){V.gres=null;render();}
+function setBuddy(e){
+ const p=curP();
+ p.buddy=(p.buddy===e)?null:e;
+ save();SFX.ok();render();
+}
 /* ================= render helpers ================= */
 function header(p){
  return '<div class="top">'
@@ -1312,7 +1520,9 @@ const ICONS={
  rika:'<svg viewBox="0 0 40 40"><path d="M17 5h6v11l7 13a4 4 0 0 1-3.4 6H13.4A4 4 0 0 1 10 29l7-13z" fill="none" stroke="#7BA5FF" stroke-width="3" stroke-linejoin="round"/><path d="M13 27h14" stroke="#7BA5FF" stroke-width="3"/><circle cx="18" cy="31" r="2" fill="#7BA5FF"/><circle cx="24" cy="30" r="1.5" fill="#7BA5FF"/></svg>',
  hira:'<svg viewBox="0 0 40 40"><path d="M20 34c-7 0-11-4-11-9 0-6 5-9 11-9s11 3 11 9c0 5-4 9-11 9z" fill="#3FB27A"/><path d="M20 16c0-5 3-9 8-11-1 6-3 9-8 11z" fill="#63C98C"/><path d="M20 16c0-5-3-9-8-11 1 6 3 9 8 11z" fill="#63C98C"/></svg>',
  kazu:'<svg viewBox="0 0 40 40"><circle cx="20" cy="15" r="10" fill="#FF8FB1"/><path d="M20 25v9" stroke="#8A5A2B" stroke-width="2.4" stroke-linecap="round"/><path d="M16 34h8" stroke="#8A5A2B" stroke-width="2.4" stroke-linecap="round"/><circle cx="16.5" cy="12" r="2.6" fill="#fff" opacity=".7"/></svg>',
- chie:'<svg viewBox="0 0 40 40"><path d="M8 12h9a3 3 0 1 1 6 0h9v9a3 3 0 1 0 0 6v5H8z" fill="#B79CFF"/><path d="M8 21a3 3 0 1 0 0-6" fill="#9E7EF0"/></svg>'
+ chie:'<svg viewBox="0 0 40 40"><path d="M8 12h9a3 3 0 1 1 6 0h9v9a3 3 0 1 0 0 6v5H8z" fill="#B79CFF"/><path d="M8 21a3 3 0 1 0 0-6" fill="#9E7EF0"/></svg>',
+ kotoba:'<svg viewBox="0 0 40 40"><path d="M7 8h26a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H18l-7 7v-7H7a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3z" fill="#FF9A5C"/><path d="M12 15h16M12 21h10" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>',
+ zatsugaku:'<svg viewBox="0 0 40 40"><path d="M16 6h8l3 24H13z" fill="#FFC94D"/><path d="M16 6h8l1 8H15z" fill="#FF7A6B"/><path d="M13 30h14l2 6H11z" fill="#8A5A2B"/><path d="M12 12 4 8M28 12l8-4M12 18H3M28 18h9" stroke="#FFE07A" stroke-width="2.4" stroke-linecap="round"/></svg>'
 };
 function subjIcon(sk){return ICONS[sk]||'';}
 /* 表示時点での正誤(選択式/入力式の両対応) */
@@ -1331,11 +1541,13 @@ function islePoints(n){
  return pts;
 }
 /* 木や岩は左右の余白にだけ置く(ノードは x=94〜259 なので絶対に重ならない) */
+/* 木や岩は左右の余白にだけ置く。位置は%なので、島の幅が変わっても
+   ノード(中心26%〜72%・半径40px)と重ならないことを幅290px〜532pxで保証(test13) */
 function isleDecor(H){
  const out=[];
  let i=0;
  for(let y=214;y<H-46;y+=98){
-  out.push({x:(i%2===0)?26:334,y:y,rock:(i%4===3),big:(i%3===0)});
+  out.push({xp:(i%2===0)?5.2:94.8,y:y,rock:(i%4===3),big:(i%3===0)});
   i++;
  }
  return out;
@@ -1344,7 +1556,7 @@ const CLOUD_D='M14 24C6 24 1 19 1 13S7 3 14 4c2-3 6-4 10-2 3-3 9-3 12 1 8-1 12 4
 function isleBackdrop(H){
  let h='<div class="isleBg" aria-hidden="true">';
  // 星(よぞらテーマのみ見える)
- h+='<svg class="bgStars" viewBox="0 0 360 96">';
+ h+='<svg class="bgStars" viewBox="0 0 360 96" preserveAspectRatio="none">';
  const st=[[22,18],[58,52],[96,26],[130,68],[168,14],[196,44],[232,72],[268,22],[292,58],[330,36],[44,80],[152,88],[312,84]];
  st.forEach((s,i)=>{h+='<circle cx="'+s[0]+'" cy="'+s[1]+'" r="'+(i%3===0?1.6:1.1)+'" fill="#fff" opacity="'+(i%2?.9:.55)+'"/>';});
  h+='</svg>';
@@ -1373,8 +1585,8 @@ function isleBackdrop(H){
   +'<path d="M0 26C80 4 130 34 200 18c70-16 120 10 160-6v44H0z" fill="var(--gnd2)" opacity=".5"/></svg>';
  // 木と岩(左右の余白)
  for(const d of isleDecor(H)){
-  const sc=d.big?1.15:.9, w=38*sc, ht=48*sc;
-  h+='<svg class="bgTree" style="left:'+(d.x-w/2)+'px;top:'+(d.y-ht)+'px;width:'+w+'px;height:'+ht+'px" viewBox="0 0 38 48">';
+  const sc=d.big?1.15:.9, w=32*sc, ht=42*sc;
+  h+='<svg class="bgTree" style="left:calc('+d.xp+'% - '+(w/2)+'px);top:'+(d.y-ht)+'px;width:'+w+'px;height:'+ht+'px" viewBox="0 0 38 48">';
   if(d.rock)h+='<ellipse cx="19" cy="40" rx="14" ry="8" fill="var(--mtn2)"/><ellipse cx="15" cy="37" rx="7" ry="4" fill="#fff" opacity=".14"/>';
   else h+='<rect x="16" y="32" width="6" height="14" rx="2" fill="#7A5433"/>'
    +'<path d="M19 2 32 22H6z" fill="var(--tree2)"/><path d="M19 12 34 36H4z" fill="var(--tree)"/>';
@@ -1540,6 +1752,7 @@ function render(){
   h+=questCard(p);
   h+=restNotice(p);
   h+=weekStrip(p);
+  h+=familyTreeCard();
   h+=islandView(p);
   h+=gachaCard(p);
   h+='<div class="row" style="margin-top:16px;justify-content:center">'
@@ -1552,7 +1765,11 @@ function render(){
    else{
     const g=V.gres.g;
     h+='<div class="rar">'+(g.r==='SR'?'★★★ スーパーレア!':g.r==='R'?'★★ レア!':'★ なかま')+'</div><div class="gbig">'+g.e+'</div><h2>'+g.n+'</h2>';
-    h+=V.gres.dup?'<div class="mut">もう なかまだった! 🪙5 もどってきたよ</div>':'<div class="mut">あたらしい なかまが ふえた!</div>';
+    if(V.gres.dup){
+     const kira=p.collection[g.e]===2;
+     h+=kira?'<div class="banner ok">✨ キラに しんか した! 🪙5 も もどってきたよ</div>'
+            :'<div class="mut">もう キラの なかま! 🪙5 もどってきたよ</div>';
+    }else h+='<div class="mut">あたらしい なかまが ふえた!</div>';
    }
    h+='<div style="margin-top:14px"><button class="btn" onclick="closeG()">とじる</button></div></div></div>';
   }
@@ -1571,6 +1788,7 @@ function render(){
   let mood='idle';
   if(quiz.answered)mood=ansOk(quiz,q)?'happy':'cheer';
   h+='<div class="top"><span id="buddy" class="buddy">'+moko(mood)+'</span>'
+   +(p.buddy?'<span class="bud2">'+p.buddy+'</span>':'')
    +'<div class="prog"><i style="width:'+(quiz.idx/quiz.qs.length*100)+'%"></i></div>'
    +'<span class="pill">'+(quiz.idx+1)+'/'+quiz.qs.length+'</span></div>';
   h+='<div class="card">';
@@ -1615,10 +1833,11 @@ function render(){
  }
  else if(V.screen==='result'){
   const quiz=V.quiz;
+  const p=curP();
   const acc=quiz.correct/quiz.qs.length;
   const stars=acc>=0.9?'⭐⭐⭐':acc>=0.7?'⭐⭐☆':'⭐☆☆';
   h+='<div class="card" style="text-align:center">';
-  h+=moko(acc>=0.8?'cheer':'happy','mokoBig');
+  h+='<div class="row" style="justify-content:center;align-items:flex-end;gap:2px">'+moko(acc>=0.8?'cheer':'happy','mokoBig')+(p.buddy?'<span class="bud3">'+p.buddy+'</span>':'')+'</div>';
   h+='<h2 style="font-size:1.4rem">'+(quiz.mission?'ミッション クリア!':'クエスト クリア!')+'</h2>';
   h+='<div class="stars">'+stars+'</div>';
   h+='<div class="bignum">'+quiz.correct+' / '+quiz.qs.length+' せいかい</div>';
@@ -1629,6 +1848,7 @@ function render(){
   if(quiz.weekBonus)h+='<div class="banner ok">こんしゅうの ゴール たっせい! コイン+'+WEEK_REWARD+' と おまもり+1</div>';
   if(acc>=1&&!quiz.capped)h+='<div class="mut">パーフェクトボーナス こみ!</div>';
   if(quiz.lvMsg==='up')h+='<div class="banner ok">🎉 レベルアップ! もんだいが すこし むずかしくなるよ</div>';
+  if(quiz.lvMsg==='soon')h+='<div class="expl">きょうは ここまで マスター! つづきは あした、もっと つよくなれるよ</div>';
   if(quiz.lvMsg==='find')h+='<div class="expl">ちょうどいい レベルを みつけたよ。ここから じっくり!</div>';
   if(quiz.lvMsg==='down')h+='<div class="expl">すこし もどって じっくり いこう。あせらなくて だいじょうぶ!</div>';
   h+='<div class="row" style="justify-content:center;margin-top:14px">'
@@ -1640,10 +1860,20 @@ function render(){
   const p=S.profiles[V.pid];
   const owned=Object.keys(p.collection).length;
   h+='<div class="top"><button class="btn ghost small" onclick="go(\'home\')">◀ もどる</button><h1>📖 なかまずかん</h1><div class="sp"></div><span class="pill">'+owned+'/'+GACHA.length+'</span></div>';
+  if(owned>=GACHA.length)h+='<div class="banner ok">🏆 ずかん コンプリート! きみは でんせつの コレクター!</div>';
+  h+='<div class="card" style="padding:10px 14px"><div class="mut" style="font-size:.75rem">なかまを タップすると「きょうの おとも」になって、クエストに ついてきてくれるよ'+(p.buddy?'(いま: '+p.buddy+')':'')+'</div></div>';
   h+='<div class="grid">';
   for(const g of GACHA){
-   const has=p.collection[g.e];
-   h+='<div class="gitem'+(has?'':' lock')+'"><div class="rar">'+g.r+'</div><div class="e">'+(has?g.e:'❓')+'</div><div class="n">'+(has?g.n:'???')+'</div></div>';
+   const n=p.collection[g.e]||0;
+   const isBud=p.buddy===g.e;
+   if(n>0){
+    h+='<button class="gitem'+(isBud?' bud':'')+'" onclick="setBuddy(\''+g.e+'\')">'
+     +(n>=2?'<div class="kira">✨</div>':'')
+     +(isBud?'<div class="budtag">おとも</div>':'')
+     +'<div class="rar">'+g.r+'</div><div class="e">'+g.e+'</div><div class="n">'+g.n+'</div></button>';
+   }else{
+    h+='<div class="gitem lock"><div class="rar">'+g.r+'</div><div class="e">❓</div><div class="n">???</div></div>';
+   }
   }
   h+='</div>';
  }
@@ -1691,6 +1921,15 @@ function render(){
   h+='<div class="card"><div class="mut" style="margin-bottom:8px">下の文字を すべてコピーして、メモ帳などに保存してください。別の端末では「読み込む」に貼り付けると復元できます。</div>'
    +'<textarea id="expTa" readonly style="width:100%;height:180px;font-size:.7rem;font-family:monospace;border-radius:12px;border:2px solid var(--line);background:var(--bg2);color:var(--ink);padding:10px">'+esc(V.expData||'')+'</textarea>'
    +'<div style="text-align:center;margin-top:10px"><button class="btn small" onclick="copyExp()">コピー</button> <button class="btn ghost small" onclick="dlExp()">ファイルで保存</button></div></div>';
+  h+='<div class="card"><h2>📲 べつの たんまつへ わたす</h2><div class="mut" style="margin-bottom:8px">リンクを作って AirDrop や 家族のメッセージで送り、新しい端末で開くだけ。データはリンクの中にあり、サーバーには送られません。</div>';
+  if(V.syncUrl){
+   h+='<textarea id="syncTa" readonly style="width:100%;height:64px;font-size:.6rem;font-family:monospace;border-radius:12px;border:2px solid var(--line);background:var(--bg2);color:var(--ink);padding:8px">'+esc(V.syncUrl)+'</textarea>';
+   h+='<div style="text-align:center;margin-top:8px"><button class="btn small" onclick="shareSync()">送る</button> <button class="btn ghost small" onclick="copySync()">コピー</button></div>';
+   h+='<div class="mut" style="font-size:.68rem;margin-top:6px">※ これは「同期」ではなく「引っこし」です。両方の端末で同時に遊ぶと、あとから読み込んだほうが 上書きになります。</div>';
+  }else{
+   h+='<div style="text-align:center"><button class="btn" onclick="makeSyncLink()">ひっこしリンクを 作る</button></div>';
+  }
+  h+='</div>';
  }
  else if(V.screen==='import'){
   h+='<div class="top"><button class="btn ghost small" onclick="go(\'parent\')">◀ もどる</button><h1>📥 データの読み込み</h1></div>';
@@ -1794,6 +2033,16 @@ function parentCard(pid){
  h+='<div class="row" style="margin-top:6px"><input type="text" id="stmsg_'+pid+'" maxlength="20" placeholder="ひとこと(なくてもOK)" style="flex:1">'
   +'<button class="btn small" onclick="sendStamp(\''+pid+'\')">送る</button></div>';
  h+='<div class="mut" style="font-size:.7rem;margin-top:2px">次にこの子がホームを開いたとき、モコと一緒に届きます</div></div>';
+ // この子だけを べつの端末へ(合流)
+ h+='<div style="margin-top:12px"><label style="margin:0 0 4px;display:block">この子を べつの端末へ(合流)</label>';
+ if(V.pSyncPid===pid&&V.pSyncUrl){
+  h+='<textarea id="psyncTa" readonly style="width:100%;height:52px;font-size:.58rem;font-family:monospace;border-radius:10px;border:2px solid var(--line);background:var(--bg2);color:var(--ink);padding:6px">'+esc(V.pSyncUrl)+'</textarea>';
+  h+='<div style="text-align:center;margin-top:6px"><button class="btn small" onclick="sharePSync()">送る</button> <button class="btn ghost small" onclick="copyPSync()">コピー</button></div>';
+  h+='<div class="mut" style="font-size:.68rem;margin-top:4px">受け取った端末で開くと、この子が追加されます。同じ名前の子がすでにいる場合は「上書きして更新するか」「別のなかまとして追加するか」を選べます。以後は端末ごとに別データです(同期はされません)。</div>';
+ }else{
+  h+='<div style="text-align:center"><button class="btn ghost small" onclick="makeProfileLink(\''+pid+'\')">合流リンクを作る</button></div>';
+ }
+ h+='</div>';
  // 削除(2段階 + 控えJSON表示)
  if(V.resetArm===pid){
   h+='<div style="margin-top:10px"><div class="mut" style="margin-bottom:6px">削除前の控えです。必要ならコピーして保存してください:</div>'
@@ -1962,8 +2211,150 @@ function lockTap(e){
 }
 function lockByPin(){const v=prompt('おうちのかたのPIN');if(v===S.pin)enterProfile(V.lockPid);else if(v!=null)alert('PINがちがいます');}
 
+/* ================= たんまつ間の ひっこしリンク =================
+   全データを圧縮してURLの#以降に埋め込む。#以降はサーバーに送信されないので、
+   GitHub Pagesの静的ホスティングでもデータが外部に出ない。
+   注意: これは「同期」ではなく「転送」。最後に読み込んだ側が正になる。 */
+function b64u(bytes){let s='';for(let i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function ub64u(str){const b=atob(str.replace(/-/g,'+').replace(/_/g,'/'));const out=new Uint8Array(b.length);for(let i=0;i<b.length;i++)out[i]=b.charCodeAt(i);return out;}
+async function syncEncode(json){
+ try{
+  if(typeof CompressionStream!=='undefined'){
+   const stream=new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'));
+   const buf=await new Response(stream).arrayBuffer();
+   return 'g'+b64u(new Uint8Array(buf));
+  }
+ }catch(e){}
+ return 'p'+b64u(new TextEncoder().encode(json));
+}
+async function syncDecode(payload){
+ const mode=payload[0],body=payload.slice(1);
+ const bytes=ub64u(body);
+ if(mode==='g'){
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return await new Response(stream).text();
+ }
+ return new TextDecoder().decode(bytes);
+}
+async function makeSyncLink(){
+ SFX.click();
+ const payload=await syncEncode(JSON.stringify(S));
+ const base=(typeof location!=='undefined')?location.href.split('#')[0]:'';
+ V.syncUrl=base+'#mq='+payload;
+ render();
+}
+function copySync(){
+ try{const t=document.getElementById('syncTa');if(t){t.select();document.execCommand('copy');}}catch(e){}
+ try{navigator.clipboard&&navigator.clipboard.writeText(V.syncUrl);}catch(e){}
+ SFX.ok();
+}
+function shareSync(){
+ try{
+  if(navigator.share){navigator.share({title:'まなびクエスト ひっこしリンク',url:V.syncUrl});return;}
+ }catch(e){}
+ copySync();alert('リンクをコピーしました。AirDropやメッセージで送ってください');
+}
+/* 起動時: #mq= があれば読み込みを提案 */
+async function tryHashImport(){
+ if(typeof location==='undefined'||!location.hash)return false;
+ // なかま合流リンク(この子だけ)
+ const mp=location.hash.match(/^#mp=(.+)$/);
+ if(mp){
+  try{
+   const o=JSON.parse(await syncDecode(mp[1]));
+   const err=validProfile(o);
+   if(err)alert('合流リンクを読み込めませんでした('+err+')');
+   else{
+    const nm=o.profile.name;
+    const exist=S.order.find(id=>S.profiles[id]&&S.profiles[id].name===nm);
+    if(exist){
+     // 同名がいる: まず「上書き(こうしん)」を提案し、断られたら「別として追加」を提案
+     if(confirm('「'+nm+'」は この端末にも います。\nリンクのデータで 上書き(こうしん)しますか?\n\nOK = 上書きする(この端末での「'+nm+'」のその後の進みは消えます)\nキャンセル = 上書きしない')){
+      const uerr=updateProfileData(exist,o.profile);
+      if(uerr)alert(uerr);else V.unlocked=true;
+     }else if(confirm('では、「'+nm+'(2)」のように 別のなかまとして 追加しますか?')){
+      const merr=mergeProfile(o.profile);
+      if(merr)alert(merr);else V.unlocked=true;
+     }
+    }else if(confirm('「'+nm+'」を この端末の なかまに くわえますか?\n(この端末の ほかのなかまは そのままです)')){
+     const merr=mergeProfile(o.profile);
+     if(merr)alert(merr);else V.unlocked=true;
+    }
+   }
+  }catch(e){alert('合流リンクを読み込めませんでした');}
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  return true;
+ }
+ const m=location.hash.match(/^#mq=(.+)$/);
+ if(!m)return false;
+ let handled=false;
+ try{
+  const json=await syncDecode(m[1]);
+  const o=JSON.parse(json);
+  const err=validImport(o);
+  if(err){alert('リンクのデータを読み込めませんでした('+err+')');}
+  else if(confirm('ひっこしリンクを見つけました。\nこの端末に読み込みますか?\n(この端末の今のデータは、控えに退避されます)')){
+   try{await Storage.set('manabiquest-backup',JSON.stringify(S));}catch(e){}
+   S=o;migrate();V.unlocked=true;V.pid=null;S.active=null;save();
+   handled=true;
+  }
+ }catch(e){alert('リンクのデータを読み込めませんでした');}
+ try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+ return handled;
+}
+/* ---- この子だけの合流リンク(#mp=): 置き換えではなく「なかまに追加」する ---- */
+async function makeProfileLink(pid){
+ SFX.click();
+ const p=S.profiles[pid];if(!p)return;
+ const payload=await syncEncode(JSON.stringify({one:1,version:SCHEMA_VERSION,profile:p}));
+ const base=(typeof location!=='undefined')?location.href.split('#')[0]:'';
+ V.pSyncUrl=base+'#mp='+payload;
+ V.pSyncPid=pid;
+ render();
+}
+function copyPSync(){
+ try{const t=document.getElementById('psyncTa');if(t){t.select();document.execCommand('copy');}}catch(e){}
+ try{navigator.clipboard&&navigator.clipboard.writeText(V.pSyncUrl);}catch(e){}
+ SFX.ok();
+}
+function sharePSync(){
+ try{if(navigator.share){navigator.share({title:'まなびクエスト なかま合流リンク',url:V.pSyncUrl});return;}}catch(e){}
+ copyPSync();alert('リンクをコピーしました。AirDropやメッセージで送ってください');
+}
+function validProfile(o){
+ if(!o||typeof o!=='object')return 'データの形式が正しくありません';
+ if(o.one!==1||!o.profile)return 'なかま合流リンクではありません';
+ const p=o.profile;
+ if(typeof p.name!=='string'||p.name.length<1||p.name.length>40)return 'なまえが不正です';
+ if(!p.subjects||typeof p.subjects!=='object')return '学習データがありません';
+ if(JSON.stringify(p).length>400000)return 'データが大きすぎます';
+ return null;
+}
+function updateProfileData(id,pr){
+ if(!S.profiles[id])return 'なかまが見つかりません';
+ const np=JSON.parse(JSON.stringify(pr));
+ S.profiles[id]=np; // idはそのまま=アクティブ選択などの参照を壊さない
+ migrate(); // 欠けフィールドの補完
+ save();
+ return null;
+}
+function mergeProfile(pr){
+ if(S.order.length>=12)return 'この端末は なかまが上限(12人)です';
+ const np=JSON.parse(JSON.stringify(pr));
+ // 同名がいたら「②」を付けて区別(データは別人として保持)
+ let nm=np.name;
+ const names=S.order.map(id=>S.profiles[id].name);
+ let k=2;while(names.includes(nm)){nm=np.name+'('+k+')';k++;}
+ np.name=nm;
+ const id=uuid();
+ S.profiles[id]=np;S.order.push(id);
+ migrate(); // 欠けフィールドの補完
+ save();
+ return null;
+}
 /* ---- export / import (P0-2, P4-5) ---- */
 function doExport(){
+ V.syncUrl=null;V.pSyncUrl=null;V.pSyncPid=null;
  V.expData=JSON.stringify(S);
  for(const id of S.order)S.profiles[id].lastBackup=today();
  save();SFX.click();V.screen='export';render();
@@ -2034,7 +2425,7 @@ function readInbox(){const p=curP();const m=(p.inbox||[]).find(x=>!x.read);if(m)
 
 /* ---- demo mode (P4-6) ---- */
 function demoState(){
- const dd={version:SCHEMA_VERSION,pin:'1234',sound:S.sound,active:null,appLock:null,family:{name:'サンプル',flower:120},lastSeen:today(),profiles:{},order:[]};
+ const dd={version:SCHEMA_VERSION,pin:'1234',sound:S.sound,active:null,appLock:null,family:{name:'サンプル',flower:0,legacy:120},lastSeen:today(),profiles:{},order:[]};
  const demo=[['たろう','🦖','adventure','g34',{kanji:4,math:5,eigo:2,rika:2}],['はなこ','🐰','pastel','kinder',{hira:3,kazu:2,eigo:2,chie:2}]];
  demo.forEach((dp,n)=>{
   const id='demo'+n;const p=newProfile(dp[0],dp[1],dp[2],dp[3]);p.placement=false;
@@ -2056,6 +2447,7 @@ function toggleDemo(){
 /* ================= init ================= */
 (async()=>{
  await load();
+ await tryHashImport();
  V.unlocked=!S.appLock;
  if(!S.order.length)V.screen='welcome';
  else if(S.active&&S.profiles[S.active]&&V.unlocked){V.pid=S.active;V.screen='home';}

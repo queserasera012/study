@@ -1918,7 +1918,7 @@ function render(){
   }else if(!cloudReady()){
    h+='<div class="mut" style="margin-bottom:8px">自分のSupabase(無料)にデータを置いて、家族の端末どうしで受け渡しできます。<b>あいことばで暗号化してから</b>送るので、サーバー側では中身を読めません。設定手順は同梱の「かぞく同期セットアップ」を見てください。</div>';
    h+='<label>SupabaseプロジェクトURL</label><input type="text" id="cldUrl" placeholder="https://xxxx.supabase.co" style="width:100%">';
-   h+='<label>anonキー(公開用キー)</label><input type="text" id="cldKey" placeholder="eyJhbGciOi..." style="width:100%">';
+   h+='<label>公開用キー(anon または publishable)</label><input type="text" id="cldKey" placeholder="eyJ… か sb_publishable_…" style="width:100%">';
    h+='<label>かぞくの あいことば(8文字以上・全端末で同じものを)</label><input type="text" id="cldPass" placeholder="例: からあげプリンぎょうざ32" style="width:100%">';
    h+='<div style="text-align:center;margin-top:10px"><button class="btn small" onclick="cloudSetup()">設定して有効化</button></div>';
   }else{
@@ -2382,9 +2382,13 @@ function cloudPickCancel(){V.cloudPick=null;V.cloudMsg='';render();}
 function cloudReady(){return !!(S.cloud&&S.cloud.url&&S.cloud.key&&S.cloud.pass);}
 function cloudAvail(){return typeof crypto!=='undefined'&&crypto.subtle;}
 async function cloudCall(fn,body){
+ /* 旧形式キー(eyJ…のJWT)は apikey + Authorization の両方、
+    新形式キー(sb_publishable_…)は Authorization: Bearer に入れると拒否されるため apikey のみ */
+ const hdr={'Content-Type':'application/json','apikey':S.cloud.key};
+ if(S.cloud.key.indexOf('eyJ')===0)hdr['Authorization']='Bearer '+S.cloud.key;
  const r=await fetch(S.cloud.url.replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{
   method:'POST',
-  headers:{'Content-Type':'application/json','apikey':S.cloud.key,'Authorization':'Bearer '+S.cloud.key},
+  headers:hdr,
   body:JSON.stringify(body)});
  if(!r.ok)throw new Error('server '+r.status);
  const t=await r.text();
@@ -2431,7 +2435,8 @@ function cloudSetup(){
  if(!u||!k||!ps)return;
  const url=u.value.trim(),key=k.value.trim(),pass=ps.value.trim();
  if(!/^https:\/\//.test(url)){alert('URLは https:// から始まるSupabaseプロジェクトURLを入れてください');return;}
- if(key.length<20){alert('anonキーが短すぎます。Supabaseの Project Settings → API からコピーしてください');return;}
+ if(key.length<20){alert('キーが短すぎます。Project Settings → API Keys からコピーしてください(eyJ… か sb_publishable_… で始まる公開用キー)');return;}
+ if(/^sb_secret_/.test(key)||key.indexOf('service_role')>=0){alert('それは秘密キーです! 絶対に使わないでください。公開用(anon か publishable)のキーを使います');return;}
  if(pass.length<8){alert('あいことばは8文字以上にしてください。\n家族の外に漏れない、推測されにくいものを(例: すきな食べもの3つ+数字)');return;}
  S.cloud={url:url,key:key,pass:pass,lastPush:'',lastPull:''};
  save();SFX.ok();V.cloudMsg='設定しました。まずこの端末から「アップロード」してください';render();

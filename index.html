@@ -668,7 +668,7 @@ function newProfile(name,emoji,theme,grade){
 /* 出荷時は なかまゼロ。名前は購入者の家庭が最初に入力する(他人の家族構成を同梱しない) */
 function defState(){
  return {version:SCHEMA_VERSION,pin:'1234',sound:true,active:null,family:{name:'',flower:0},lastSeen:'',
-   appLock:null,coinCap:COIN_CAP,profiles:{},order:[]};
+   appLock:null,coinCap:COIN_CAP,cloud:null,profiles:{},order:[]};
 }
 /* ---- migrate chain: v1/v2(固定p1/p2) → v3(UUID+order) ---- */
 function migrate(){
@@ -686,6 +686,7 @@ function migrate(){
  if(S.sound===undefined)S.sound=true;
  if(S.appLock===undefined)S.appLock=null;
  if(S.coinCap===undefined)S.coinCap=COIN_CAP;
+ if(S.cloud===undefined)S.cloud=null;
  if(!S.family)S.family={name:'',flower:0};
  if(S.family.legacy===undefined)S.family.legacy=S.family.flower||0; // 更新前の花は端末の「これまでのぶん」として保持
  if(S.lastSeen===undefined)S.lastSeen='';
@@ -1911,7 +1912,40 @@ function render(){
   h+='<div class="card"><h2>🔑 アプリのかぎ(ログイン)</h2><div class="mut" style="margin-bottom:8px">'
    +(S.appLock?'かかっています。ひらくまで なまえも記録も表示されません。':'かけると、起動時に えもじ3つの入力を求めます。共用の端末で なまえを隠したいときに。')+'</div>'
    +'<div style="text-align:center"><button class="btn ghost small" onclick="startAppLock()">'+(S.appLock?'かぎを かえる/けす':'かぎを かける')+'</button></div></div>';
-  h+='<div class="card"><h2>💾 バックアップ</h2><div class="mut" style="margin-bottom:8px">データはこの端末の中だけに保存され、外部に送信されません。ブラウザの履歴削除等で消えることがあるため、ときどき書き出して控えを残してください。</div>'
+  h+='<div class="card"><h2>☁️ かぞく同期(ベータ)</h2>';
+  if(!cloudAvail()){
+   h+='<div class="mut">この機能は https で公開したページ(GitHub Pages版など)でのみ使えます。ファイルを直接開いている場合は使えません。</div>';
+  }else if(!cloudReady()){
+   h+='<div class="mut" style="margin-bottom:8px">自分のSupabase(無料)にデータを置いて、家族の端末どうしで受け渡しできます。<b>あいことばで暗号化してから</b>送るので、サーバー側では中身を読めません。設定手順は同梱の「かぞく同期セットアップ」を見てください。</div>';
+   h+='<label>SupabaseプロジェクトURL</label><input type="text" id="cldUrl" placeholder="https://xxxx.supabase.co" style="width:100%">';
+   h+='<label>anonキー(公開用キー)</label><input type="text" id="cldKey" placeholder="eyJhbGciOi..." style="width:100%">';
+   h+='<label>かぞくの あいことば(8文字以上・全端末で同じものを)</label><input type="text" id="cldPass" placeholder="例: からあげプリンぎょうざ32" style="width:100%">';
+   h+='<div style="text-align:center;margin-top:10px"><button class="btn small" onclick="cloudSetup()">設定して有効化</button></div>';
+  }else{
+   h+='<div class="mut" style="margin-bottom:8px">あいことばで暗号化して保管中。'
+    +(S.cloud.lastPush?'最終アップロード: '+esc(S.cloud.lastPush)+'。':'')
+    +(S.cloud.lastPull?' 最終ダウンロード: '+esc(S.cloud.lastPull)+'。':'')
+    +'</div>';
+   h+='<div class="mut" style="font-size:.72rem;margin-bottom:8px"><b>使い方:</b> 遊び終わった端末で「アップロード」→ 次に遊ぶ端末で「まるごと」。<b>2台で同時に遊んだとき</b>(兄は携帯・妹はPCなど)は、片方が「アップロード」→ もう片方が「この子だけ」でその子を取り込む → 取り込んだ側が「アップロード」、で合流できます。</div>';
+   h+='<div class="row" style="justify-content:center">'
+    +'<button class="btn small"'+(V.cloudBusy?' disabled':'')+' onclick="cloudPush()">⬆ アップロード</button>'
+    +'<button class="btn small"'+(V.cloudBusy?' disabled':'')+' onclick="cloudPull()">⬇ まるごと</button>'
+    +'<button class="btn small"'+(V.cloudBusy?' disabled':'')+' onclick="cloudFetchPick()">👤 この子だけ</button>'
+    +'<button class="btn ghost small" onclick="cloudClear()">解除</button></div>';
+   if(V.cloudPick){
+    const cs=V.cloudPick.state;
+    h+='<div style="margin-top:10px"><div class="mut" style="font-size:.72rem;margin-bottom:6px">クラウドのデータ(最終アップロード: '+esc(V.cloudPick.when)+')。とりこむ子を選んでください:</div>';
+    for(const cid of cs.order){
+     const cp=cs.profiles[cid];if(!cp)continue;
+     h+='<button class="btn ghost small" style="display:block;width:100%;margin-bottom:6px;text-align:left" onclick="cloudPickChild(\''+cid+'\')">'
+      +esc(cp.name)+' <span class="mut" style="font-size:.68rem">(最終プレイ: '+esc(cp.lastPlayed||'なし')+' / 🪙'+(cp.coins||0)+')</span></button>';
+    }
+    h+='<div style="text-align:center"><button class="btn ghost small" onclick="cloudPickCancel()">キャンセル</button></div></div>';
+   }
+  }
+  if(V.cloudMsg)h+='<div class="mut" style="margin-top:8px;text-align:center;font-weight:700">'+esc(V.cloudMsg)+'</div>';
+  h+='</div>';
+  h+='<div class="card"><h2>💾 バックアップ</h2><div class="mut" style="margin-bottom:8px">学習データはこの端末の中に保存されます(かぞく同期を使う場合も、暗号化された状態でのみ送られます)。ブラウザの履歴削除等で消えることがあるため、ときどき書き出して控えを残してください。</div>'
    +'<div class="row"><button class="btn small" onclick="doExport()">📤 書き出す</button><button class="btn ghost small" onclick="V.screen=\'import\';V.ieMsg=\'\';render()">📥 読み込む</button></div></div>';
   h+='<div class="card"><h2>📸 デモモード</h2><div class="mut" style="margin-bottom:8px">記事や商品画像の撮影用に、実データに触れずダミーの画面に切り替えます。</div>'
    +'<div style="text-align:center"><button class="btn ghost small" onclick="toggleDemo()">'+(V.demo?'デモを おわる':'デモモードに する')+'</button></div></div>';
@@ -2265,21 +2299,7 @@ async function tryHashImport(){
    const err=validProfile(o);
    if(err)alert('合流リンクを読み込めませんでした('+err+')');
    else{
-    const nm=o.profile.name;
-    const exist=S.order.find(id=>S.profiles[id]&&S.profiles[id].name===nm);
-    if(exist){
-     // 同名がいる: まず「上書き(こうしん)」を提案し、断られたら「別として追加」を提案
-     if(confirm('「'+nm+'」は この端末にも います。\nリンクのデータで 上書き(こうしん)しますか?\n\nOK = 上書きする(この端末での「'+nm+'」のその後の進みは消えます)\nキャンセル = 上書きしない')){
-      const uerr=updateProfileData(exist,o.profile);
-      if(uerr)alert(uerr);else V.unlocked=true;
-     }else if(confirm('では、「'+nm+'(2)」のように 別のなかまとして 追加しますか?')){
-      const merr=mergeProfile(o.profile);
-      if(merr)alert(merr);else V.unlocked=true;
-     }
-    }else if(confirm('「'+nm+'」を この端末の なかまに くわえますか?\n(この端末の ほかのなかまは そのままです)')){
-     const merr=mergeProfile(o.profile);
-     if(merr)alert(merr);else V.unlocked=true;
-    }
+    if(interactiveMergeProfile(o.profile))V.unlocked=true;
    }
   }catch(e){alert('合流リンクを読み込めませんでした');}
   try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
@@ -2301,6 +2321,125 @@ async function tryHashImport(){
  }catch(e){alert('リンクのデータを読み込めませんでした');}
  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
  return handled;
+}
+/* ================= かぞく同期(ゼロ知識・ベータ) =================
+   あいことば → PBKDF2(31万回) → 512bit を導出し、
+   前半256bit = AES-GCM鍵(端末の外に出ない) / 後半256bit = 保管場所ID(サーバーの行キー)。
+   サーバー(Supabase)が持つのは {意味不明なID, 暗号文, 更新時刻} だけ。
+   あいことばを知らない限り、運営者にもサーバー侵入者にも中身は読めない。 */
+const CLOUD_ITER=310000;
+async function kdf(pass){
+ const enc=new TextEncoder();
+ const km=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveBits']);
+ const bits=await crypto.subtle.deriveBits(
+  {name:'PBKDF2',salt:enc.encode('manabiquest-sync-v1'),iterations:CLOUD_ITER,hash:'SHA-256'},km,512);
+ const by=new Uint8Array(bits);
+ const key=await crypto.subtle.importKey('raw',by.slice(0,32),'AES-GCM',false,['encrypt','decrypt']);
+ return {key,id:b64u(by.slice(32))};
+}
+async function cloudEncrypt(json,key){
+ const inner=await syncEncode(json); // gzip+base64url(既存機構を再利用)
+ const iv=crypto.getRandomValues(new Uint8Array(12));
+ const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(inner)));
+ const out=new Uint8Array(12+ct.length);out.set(iv,0);out.set(ct,12);
+ return b64u(out);
+}
+async function cloudDecrypt(payload,key){
+ const by=ub64u(payload);
+ const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:by.slice(0,12)},key,by.slice(12));
+ return await syncDecode(new TextDecoder().decode(new Uint8Array(pt)));
+}
+/* クラウドの家族データから「この子だけ」取り込む(2台同時遊びのあとの合流用)。
+   まるごとダウンロードと違い、この端末のほかの子は無傷のまま。 */
+async function cloudFetchPick(){
+ if(V.cloudBusy)return;V.cloudBusy=true;V.cloudMsg='クラウドを確認中…';V.cloudPick=null;render();
+ try{
+  const {key,id}=await kdf(S.cloud.pass);
+  const row=await cloudCall('mq_get',{p_id:id});
+  if(!row||!row.blob){V.cloudMsg='クラウドにデータが見つかりません。まだアップロードしていないか、あいことばが他の端末と違う可能性があります';V.cloudBusy=false;render();return;}
+  let json;
+  try{json=await cloudDecrypt(row.blob,key);}
+  catch(e){V.cloudMsg='復号できませんでした。あいことばが違う可能性があります';SFX.ng();V.cloudBusy=false;render();return;}
+  const o=JSON.parse(json);
+  const err=validImport(o);
+  if(err){V.cloudMsg='データが不正です('+err+')';V.cloudBusy=false;render();return;}
+  if(!o.order||!o.order.length){V.cloudMsg='クラウドのデータに なかまが いません';V.cloudBusy=false;render();return;}
+  V.cloudPick={state:o,when:row.updated_at?new Date(row.updated_at).toLocaleString('ja-JP'):'不明'};
+  V.cloudMsg='';
+ }catch(e){V.cloudMsg='失敗: '+(e.message||'通信エラー')+'。URL・キー・接続を確認してください';SFX.ng();}
+ V.cloudBusy=false;render();
+}
+function cloudPickChild(pid){
+ const o=V.cloudPick&&V.cloudPick.state;if(!o)return;
+ const pr=o.profiles[pid];if(!pr)return;
+ if(interactiveMergeProfile(pr)){
+  save();SFX.ok();
+  V.cloudMsg='「'+pr.name+'」を とりこみました。この端末が最新の状態になったので、続けて「アップロード」すると 他の端末にも配れます';
+ }else V.cloudMsg='';
+ V.cloudPick=null;render();
+}
+function cloudPickCancel(){V.cloudPick=null;V.cloudMsg='';render();}
+function cloudReady(){return !!(S.cloud&&S.cloud.url&&S.cloud.key&&S.cloud.pass);}
+function cloudAvail(){return typeof crypto!=='undefined'&&crypto.subtle;}
+async function cloudCall(fn,body){
+ const r=await fetch(S.cloud.url.replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{
+  method:'POST',
+  headers:{'Content-Type':'application/json','apikey':S.cloud.key,'Authorization':'Bearer '+S.cloud.key},
+  body:JSON.stringify(body)});
+ if(!r.ok)throw new Error('server '+r.status);
+ const t=await r.text();
+ return t?JSON.parse(t):null;
+}
+async function cloudPush(){
+ if(V.cloudBusy)return;V.cloudBusy=true;V.cloudMsg='アップロード中…';render();
+ try{
+  const {key,id}=await kdf(S.cloud.pass);
+  const blob=await cloudEncrypt(JSON.stringify(S),key);
+  await cloudCall('mq_put',{p_id:id,p_blob:blob});
+  S.cloud.lastPush=new Date().toLocaleString('ja-JP');save();
+  V.cloudMsg='アップロード完了(この端末 → クラウド)';SFX.ok();
+ }catch(e){V.cloudMsg='失敗: '+(e.message||'通信エラー')+'。URL・キー・接続を確認してください';SFX.ng();}
+ V.cloudBusy=false;render();
+}
+async function cloudPull(){
+ if(V.cloudBusy)return;V.cloudBusy=true;V.cloudMsg='ダウンロード中…';render();
+ try{
+  const {key,id}=await kdf(S.cloud.pass);
+  const row=await cloudCall('mq_get',{p_id:id});
+  if(!row||!row.blob){V.cloudMsg='クラウドにデータが見つかりません。まだアップロードしていないか、あいことばが他の端末と違う可能性があります';V.cloudBusy=false;render();return;}
+  let json;
+  try{json=await cloudDecrypt(row.blob,key);}
+  catch(e){V.cloudMsg='復号できませんでした。あいことばが違う可能性があります';SFX.ng();V.cloudBusy=false;render();return;}
+  const o=JSON.parse(json);
+  const err=validImport(o);
+  if(err){V.cloudMsg='データが不正です('+err+')';V.cloudBusy=false;render();return;}
+  const when=row.updated_at?new Date(row.updated_at).toLocaleString('ja-JP'):'不明';
+  if(confirm('クラウドのデータ(最終アップロード: '+when+')で\nこの端末を置き換えますか?\n\nこの端末でその後に進んだ分は消えます。\n(今のデータは控えに退避されます)')){
+   const cloudCfg=S.cloud; // 端末側の同期設定は維持
+   try{await Storage.set('manabiquest-backup',JSON.stringify(S));}catch(e){}
+   S=o;migrate();
+   if(!S.cloud||!S.cloud.url)S.cloud=cloudCfg;
+   S.cloud.lastPull=new Date().toLocaleString('ja-JP');
+   V.unlocked=true;V.pid=null;S.active=null;save();
+   V.cloudMsg='ダウンロード完了(クラウド → この端末)';SFX.ok();
+  }else V.cloudMsg='';
+ }catch(e){V.cloudMsg='失敗: '+(e.message||'通信エラー')+'。URL・キー・接続を確認してください';SFX.ng();}
+ V.cloudBusy=false;render();
+}
+function cloudSetup(){
+ const u=document.getElementById('cldUrl'),k=document.getElementById('cldKey'),ps=document.getElementById('cldPass');
+ if(!u||!k||!ps)return;
+ const url=u.value.trim(),key=k.value.trim(),pass=ps.value.trim();
+ if(!/^https:\/\//.test(url)){alert('URLは https:// から始まるSupabaseプロジェクトURLを入れてください');return;}
+ if(key.length<20){alert('anonキーが短すぎます。Supabaseの Project Settings → API からコピーしてください');return;}
+ if(pass.length<8){alert('あいことばは8文字以上にしてください。\n家族の外に漏れない、推測されにくいものを(例: すきな食べもの3つ+数字)');return;}
+ S.cloud={url:url,key:key,pass:pass,lastPush:'',lastPull:''};
+ save();SFX.ok();V.cloudMsg='設定しました。まずこの端末から「アップロード」してください';render();
+}
+function cloudClear(){
+ if(confirm('同期設定を解除しますか?(クラウド上のデータは消えません。学習データもこの端末に残ります)')){
+  S.cloud=null;save();SFX.click();V.cloudMsg='';render();
+ }
 }
 /* ---- この子だけの合流リンク(#mp=): 置き換えではなく「なかまに追加」する ---- */
 async function makeProfileLink(pid){
@@ -2351,6 +2490,32 @@ function mergeProfile(pr){
  migrate(); // 欠けフィールドの補完
  save();
  return null;
+}
+/* 受け取ったプロフィール1人分を、確認をとりながら この端末へ反映する。
+   同名あり → 上書き? → いいえなら 別として追加? / 同名なし → 追加?
+   反映したら true を返す(#mp=リンクとクラウド取り込みで共通)。 */
+function interactiveMergeProfile(pr){
+ const nm=pr.name;
+ const exist=S.order.find(id=>S.profiles[id]&&S.profiles[id].name===nm);
+ if(exist){
+  if(confirm('「'+nm+'」は この端末にも います。\n受け取ったデータで 上書き(こうしん)しますか?\n\nOK = 上書きする(この端末での「'+nm+'」のその後の進みは消えます)\nキャンセル = 上書きしない')){
+   const uerr=updateProfileData(exist,pr);
+   if(uerr){alert(uerr);return false;}
+   return true;
+  }
+  if(confirm('では、「'+nm+'(2)」のように 別のなかまとして 追加しますか?')){
+   const merr=mergeProfile(pr);
+   if(merr){alert(merr);return false;}
+   return true;
+  }
+  return false;
+ }
+ if(confirm('「'+nm+'」を この端末の なかまに くわえますか?\n(この端末の ほかのなかまは そのままです)')){
+  const merr=mergeProfile(pr);
+  if(merr){alert(merr);return false;}
+  return true;
+ }
+ return false;
 }
 /* ---- export / import (P0-2, P4-5) ---- */
 function doExport(){

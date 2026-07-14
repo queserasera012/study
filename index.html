@@ -2549,7 +2549,7 @@ async function cloudFetchPick(){
  if(V.cloudBusy)return;V.cloudBusy=true;V.cloudMsg='クラウドを確認中…';V.cloudPick=null;render();
  try{
   const {key,id}=await kdf(S.cloud.pass);
-  const row=await cloudCall('mq_get',{p_id:id});
+  const row=rpcRow(await cloudCall('mq_get',{p_id:id}));
   if(!row||!row.blob){V.cloudMsg='クラウドにデータが見つかりません。まだアップロードしていないか、あいことばが他の端末と違う可能性があります';V.cloudBusy=false;render();return;}
   let json;
   try{json=await cloudDecrypt(row.blob,key);}
@@ -2575,6 +2575,14 @@ function cloudPickChild(pid){
 function cloudPickCancel(){V.cloudPick=null;V.cloudMsg='';render();}
 function cloudReady(){return !!(S.cloud&&S.cloud.url&&S.cloud.key&&S.cloud.pass);}
 function cloudAvail(){return typeof crypto!=='undefined'&&crypto.subtle;}
+/* PostgREST は「テーブルを返す関数(returns table)」の結果を必ず JSON 配列で返す。
+   つまり mq_get は [{blob,updated_at}] または [] で返ってくる。
+   将来 SQL 側を単一オブジェクト返しに変えても壊れないよう、両方の形を受け付ける。 */
+function rpcRow(res){
+ if(!res)return null;
+ if(Array.isArray(res))return res.length?res[0]:null;
+ return res;
+}
 async function cloudCall(fn,body){
  /* 旧形式キー(eyJ…のJWT)は apikey + Authorization の両方、
     新形式キー(sb_publishable_…)は Authorization: Bearer に入れると拒否されるため apikey のみ */
@@ -2603,7 +2611,7 @@ async function cloudPull(){
  if(V.cloudBusy)return;V.cloudBusy=true;V.cloudMsg='ダウンロード中…';render();
  try{
   const {key,id}=await kdf(S.cloud.pass);
-  const row=await cloudCall('mq_get',{p_id:id});
+  const row=rpcRow(await cloudCall('mq_get',{p_id:id}));
   if(!row||!row.blob){V.cloudMsg='クラウドにデータが見つかりません。まだアップロードしていないか、あいことばが他の端末と違う可能性があります';V.cloudBusy=false;render();return;}
   let json;
   try{json=await cloudDecrypt(row.blob,key);}

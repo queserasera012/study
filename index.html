@@ -335,6 +335,18 @@ td,th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left}
 .gbig{font-size:4.5rem;margin:8px 0}
 label{font-weight:700;font-size:.9rem;display:block;margin:10px 0 4px}
 select,input[type=text],input[type=password],input[type=tel]{font-family:inherit;font-size:1rem;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--bg2);color:var(--ink);width:100%}
+/* ライト版: ロックされた教科 */
+.inode.locked{filter:grayscale(1);opacity:.62}
+.inode.locked .disc{background:#8A93A8}
+.inode .lk{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+ width:24px;height:24px;background:#6B7488;border-radius:50%;display:grid;place-items:center;
+ border:2px solid var(--card);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.inode .lk svg{width:13px;height:13px}
+.lkbig{width:74px;height:74px;margin:6px auto 2px;opacity:.5;filter:grayscale(1)}
+.lkbig svg{width:100%;height:100%;display:block}
+.lkul{margin:0 0 4px;padding-left:0;list-style:none}
+.lkul li{position:relative;padding-left:16px;margin-bottom:7px;font-size:.8rem;line-height:1.8}
+.lkul li:before{content:"";position:absolute;left:0;top:11px;width:6px;height:6px;border-radius:50%;background:var(--acc)}
 .profcard{text-align:center;padding:26px 18px}
 .profcard .e{font-size:3.4rem}
 /* きせかえテーマ選択(2列グリッド・大きめプレビュー) */
@@ -354,6 +366,54 @@ select,input[type=text],input[type=password],input[type=tel]{font-family:inherit
 <body data-theme="adventure">
 <div id="app" class="wrap"></div>
 <script>
+/* ===== BUILD CONFIG (build.jsが書き換える。手動編集しない) ===== */
+const EDITION = "full";      // "full" | "lite"
+const APP_VERSION = "1.0.0";  // 例 "1.0.0"
+const STORE_URL = "https://example.booth.pm/items/000000";  // フル版の販売ページURL(ライト版の案内に使用)
+/* ===== /BUILD CONFIG ===== */
+/* 未置換(開発中)は full 扱いにフォールバックする */
+const LITE = (EDITION === "lite");
+const VER  = (APP_VERSION.indexOf("__") === 0) ? "dev" : APP_VERSION;
+const SHOP = (STORE_URL.indexOf("__") === 0) ? "" : STORE_URL;
+
+/* ===== ライト版の制限(ここが唯一の真実) ===== */
+const LITE_PROFILES = 2;   // なかまの上限
+const LITE_SUBS     = 2;   // 各学年プリセットの先頭N教科のみ
+/* レベルの伸びしろ: 1人目は実力+2、2人目以降は実力+1 */
+const LITE_HEAD_ROOM = [2, 1];
+function liteRoom(pid){
+ const i = S.order.indexOf(pid);
+ return LITE_HEAD_ROOM[i] !== undefined ? LITE_HEAD_ROOM[i] : LITE_HEAD_ROOM[LITE_HEAD_ROOM.length - 1];
+}
+/* この教科でライト版が到達できる上限。
+   起点は「その学年プリセットの開始レベル」= その子の学年で想定される地力。
+   実力判定の着地点を起点にすると、判定が一気に上限まで駆け上がった子に制限が効かないため。
+   これにより、小5でも学年相応の難易度から始まり、+2レベルの伸びしろを体験できる。 */
+function liteBase(p, sk){
+ const g = GRADES[p.grade] || GRADES.g34;
+ return (g.subs && g.subs[sk]) || 1;
+}
+function liteCeil(p, sk){
+ if(!LITE) return 99;
+ const sb = p.subjects[sk];
+ if(!sb) return 99;
+ const pid = S.order.find(id => S.profiles[id] === p);
+ return liteBase(p, sk) + liteRoom(pid);
+}
+/* 出題に使うレベル。読み込んだデータが上限を超えていても、ここで必ず抑える(全経路に効く) */
+function playLv(p, sk){
+ const sb = p.subjects[sk];
+ if(!sb) return 1;
+ if(!LITE) return sb.level;
+ return Math.min(sb.level, liteCeil(p, sk));
+}
+/* ライト版で遊べる教科か */
+function subUnlocked(p, sk){
+ if(!LITE) return true;
+ const g = GRADES[p.grade] || GRADES.g34;
+ return Object.keys(g.subs).slice(0, LITE_SUBS).indexOf(sk) >= 0;
+}
+
 /* ================= sound ================= */
 let actx=null;
 function ac(){ if(!actx){ const A=window.AudioContext||window.webkitAudioContext; actx=new A(); } if(actx.state==='suspended')actx.resume(); return actx; }
@@ -790,8 +850,19 @@ const GRADES={
  g34:{label:'小3・小4',subs:{kanji:2,math:3,eigo:1,rika:1,kotoba:1,zatsugaku:1},len:8,autoRead:false},
  g56:{label:'小5・小6',subs:{kanji:4,math:5,eigo:2,rika:2,kotoba:2,zatsugaku:2},len:8,autoRead:false}
 };
+function maxProfiles(){return LITE?LITE_PROFILES:12;}
+/* ライト版のガチャ: N6体+R2体の8体だけ(SRは入れない) */
+let GACHA_POOL=null;
+function gachaPool(){
+ if(GACHA_POOL)return GACHA_POOL;
+ if(!LITE){GACHA_POOL=GACHA;return GACHA_POOL;}
+ const n=GACHA.filter(g=>g.r==='N').slice(0,6);
+ const r=GACHA.filter(g=>g.r==='R').slice(0,2);
+ GACHA_POOL=n.concat(r);
+ return GACHA_POOL;
+}
 function uuid(){try{if(crypto&&crypto.randomUUID)return crypto.randomUUID();}catch(e){}return 'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);}
-function newSubject(level,cap){const o={level:level||1,recent:[],miss:{},items:{},placement:true,lastUp:''};if(cap)o.max=cap;return o;}
+function newSubject(level,cap){const o={level:level||1,recent:[],miss:{},items:{},placement:true,lastUp:'',baseLv:null};if(cap)o.max=cap;return o;}
 function newProfile(name,emoji,theme,grade){
  const g=GRADES[grade]||GRADES.g34;
  const subjects={};
@@ -1249,7 +1320,7 @@ function questionFor(p,subject,key,src){
  let q=null;
  const bk=BANKS[subject];
  if(bk&&bk.type==='bank'){const it=bk.items.find(r=>r.id===key);if(it)q=mkChoice(it.c[0],it.c.slice(1),it.q,it.b,it.id,it.x);}
- if(!q)q=genQ(subject,p.subjects[subject].level,p);
+ if(!q)q=genQ(subject,playLv(p,subject),p);
  q.subj=subject;q.src=src;return q;
 }
 /* ミッションの内訳は必ずここから導く(表示と出題の食い違いを防ぐ単一の真実) */
@@ -1279,7 +1350,7 @@ function buildMission(p){
  fill(due,s.nReview,'review');
  fill(weak,s.nWeak,'weak');
  let guard=0,ri=R(subs.length);
- while(qs.length<s.len&&guard++<300){const sk=subs[(ri++)%subs.length];const q=genQ(sk,p.subjects[sk].level,p);q.subj=sk;q.src='new';add(q);}
+ while(qs.length<s.len&&guard++<300){const sk=subs[(ri++)%subs.length];const q=genQ(sk,playLv(p,sk),p);q.subj=sk;q.src='new';add(q);}
  return shuf(qs);
 }
 function missionStatus(p){
@@ -1386,7 +1457,11 @@ function finishS(){
    const s=sb.recent.reduce((a,b)=>a+b,0);
    const upT=sb.placement?win:7, dnT=sb.placement?1:3;
    let moved=false;
-   if(s>=upT&&sb.level<mx){
+   const ceil=liteCeil(p,quiz.subj);
+   if(s>=upT&&sb.level<mx&&sb.level>=ceil){
+    quiz.lvMsg='litecap'; // ライト版の上限に到達(実力判定中も突き抜けさせない)
+   }
+   else if(s>=upT&&sb.level<mx){
     /* レベルアップは1教科につき1日1回まで(実力判定モードは除外)。
        1日で駆け上がる→難問だらけ→挫折、を防ぐ。窓は保持して翌日に持ちこす。 */
     if(sb.placement||sb.lastUp!==t){
@@ -1398,7 +1473,10 @@ function finishS(){
    else if(s<=dnT&&sb.level>1){sb.level--;sb.recent=[];quiz.lvMsg=sb.placement?'find':'down';moved=true;}
    if(sb.placement){
     sb._noMove=moved?0:((sb._noMove||0)+1);
-    if(sb._noMove>=2){sb.placement=false;delete sb._noMove;}
+    if(sb._noMove>=2){
+     sb.placement=false;delete sb._noMove;
+     if(sb.baseLv===null||sb.baseLv===undefined)sb.baseLv=sb.level; // 地力が決まった
+    }
    }
   }
  }else{
@@ -1546,7 +1624,7 @@ function svgGachaMachine(canAfford){
 }
 function gachaCard(p){
  const can=p.coins>=GACHA_COST;
- const owned=Object.keys(p.collection||{}).length, total=GACHA.length;
+ const owned=Object.keys(p.collection||{}).length, total=gachaPool().length;
  let h='<div class="isleHd"><b>'+T('shop',p)+'</b><span class="ln"></span></div>';
  h+='<div class="gcard">';
  h+='<div class="gleft">'+svgGachaMachine(can)+'</div>';
@@ -1565,8 +1643,10 @@ function doGacha(){
  if(p.coins<GACHA_COST){SFX.ng();V.gres={fail:true};render();return;}
  p.coins-=GACHA_COST;
  const r=Math.random();
- const rar=r<0.05?'SR':(r<0.32?'R':'N');
- const pool=GACHA.filter(g=>g.r===rar);
+ // ライト版はSRを持たないため、SR枠はRに寄せる(存在しないレアを引かせない)
+ const rar=LITE?(r<0.30?'R':'N'):(r<0.05?'SR':(r<0.32?'R':'N'));
+ let pool=gachaPool().filter(g=>g.r===rar);
+ if(!pool.length)pool=gachaPool();
  const g=pool[R(pool.length)];
  const id=g.e;
  let dup=false;
@@ -1577,6 +1657,10 @@ function doGacha(){
  save();render();
 }
 function closeG(){V.gres=null;render();}
+/* ライト版: ロック教科をタップしたとき(課金導線その1。学習フロー中には出さない) */
+function liteLock(sk){SFX.click();V.lockSk=sk;V.lockParent=false;render();}
+function closeLock(){V.lockSk=null;V.lockParent=false;render();}
+function lockToParent(){SFX.click();V.lockParent=true;render();}
 function setBuddy(e){
  const p=curP();
  p.buddy=(p.buddy===e)?null:e;
@@ -1779,15 +1863,17 @@ function islandView(p){
   const pc=Math.round(sb.level/mx*100);
   const pt=pts[i];
   const didToday=!!(todayLog&&todayLog.s&&todayLog.s[sk]);
-  h+='<button class="inode" style="left:'+(pt.x/ISLE_W*100)+'%;top:'+(pt.y/H*100)+'%;--p:'+pc+'"'
-   +' onclick="startS(\''+sk+'\')" aria-label="'+esc(subjPlace(sk,p))+' レベル'+sb.level+'">'
+  const open=subUnlocked(p,sk);
+  h+='<button class="inode'+(open?'':' locked')+'" style="left:'+(pt.x/ISLE_W*100)+'%;top:'+(pt.y/H*100)+'%;--p:'+(open?pc:0)+'"'
+   +' onclick="'+(open?'startS(\''+sk+'\')':'liteLock(\''+sk+'\')')+'" aria-label="'+esc(subjPlace(sk,p))+(open?' レベル'+sb.level:' (フルばん)')+'">'
    +'<span class="ring"></span><span class="disc">'+subjIcon(sk)+'</span>'
-   +(didToday?'<span class="done">'+SVG_CHECK+'</span>':'')
-   +'<span class="lv">Lv'+sb.level+'</span>'
+   +(open&&didToday?'<span class="done">'+SVG_CHECK+'</span>':'')
+   +(open?'<span class="lv">Lv'+sb.level+'</span>':'<span class="lk">'+SVG_LOCK+'</span>')
    +'<span class="lbl">'+esc(subjPlace(sk,p))+'</span></button>';
  });
  return h+'</div>';
 }
+const SVG_LOCK='<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3" fill="#fff"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="12" cy="15.5" r="1.7" fill="#7A8699"/></svg>';
 const SVG_FLAME='<svg width="15" height="15" viewBox="0 0 24 24"><path d="M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 1 0 1-1 1-2 0-3-2-4-2-7z" fill="var(--ng)"/><path d="M12 12c1 1 2 2 2 4a2 2 0 0 1-4 0c0-1 1-2 2-4z" fill="var(--acc)"/></svg>';
 const SVG_COIN='<svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#FFD97A" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="4.4" fill="none" stroke="#fff" stroke-width="1.6" opacity=".8"/></svg>';
 const SVG_REVIEW='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.6" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v4h-4"/></svg>';
@@ -1871,7 +1957,7 @@ function render(){
    const lk=p.lock?' 🔒':'';
    h+='<button class="subj profcard" style="display:block" onclick="selP(\''+pid+'\')"><span class="e">'+p.emoji+'</span><div class="nm">'+esc(p.name)+lk+'</div><div class="mut">🔥 '+p.streak+'日</div></button>';
   }
-  if(S.order.length<12)h+='<button class="subj profcard" style="display:block;opacity:.85" onclick="startReg()"><span class="e">➕</span><div class="nm">あたらしいなかま</div></button>';
+  if(S.order.length<maxProfiles())h+='<button class="subj profcard" style="display:block;opacity:.85" onclick="startReg()"><span class="e">➕</span><div class="nm">あたらしいなかま</div></button>';
   h+=two?'</div>':'';
   h+=familyTreeCard();
   h+='<div style="text-align:center;margin-top:18px"><button class="btn ghost small" onclick="goParent()">👪 おうちのひとメニュー</button></div>';
@@ -1908,6 +1994,39 @@ function render(){
     }else h+='<div class="mut">あたらしい なかまが ふえた!</div>';
    }
    h+='<div style="margin-top:14px"><button class="btn" onclick="closeG()">とじる</button></div></div></div>';
+  }
+  if(V.lockSk){
+   const lp=curP();
+   if(!V.lockParent){
+    // 子ども向け: 責めない・欲しがらせない。事実だけ伝えて、親へ渡す
+    h+='<div class="modal" onclick="closeLock()"><div class="card" style="text-align:center" onclick="event.stopPropagation()">';
+    h+=moko('wave','mokoBig');
+    h+='<div class="lkbig">'+subjIcon(V.lockSk)+'</div>';
+    h+='<h2>'+esc(subjPlace(V.lockSk,lp))+'</h2>';
+    h+='<div class="mut" style="margin:8px 0 14px">ここは <b>フルばん</b>で あそべる ばしょだよ。<br>おうちのひとに きいてみてね!</div>';
+    h+='<div><button class="btn" onclick="closeLock()">わかった!</button></div>';
+    h+='<div style="margin-top:10px"><button class="btn ghost small" onclick="lockToParent()">おうちのひとに みせる</button></div>';
+    h+='</div></div>';
+   }else{
+    // 親向け: ここで初めてフル版の内容と購入先を出す
+    const g=GRADES[lp.grade]||GRADES.g34;
+    const locked=Object.keys(g.subs).filter(k=>!subUnlocked(lp,k));
+    h+='<div class="modal" onclick="closeLock()"><div class="card" onclick="event.stopPropagation()">';
+    h+='<h2>おうちのかたへ</h2>';
+    h+='<div class="mut" style="margin:8px 0 12px;font-size:.82rem;line-height:1.9">これは<b>おためし版</b>です。学習エンジン(習熟度による自動調整・まちがえた問題の復習)はフル版と同じものが動いています。</div>';
+    h+='<div class="mut" style="font-size:.8rem;font-weight:900;margin-bottom:4px">フル版でできること</div>';
+    h+='<ul class="lkul">';
+    h+='<li><b>'+esc(lp.name)+'さんの学年で、あと'+locked.length+'教科</b>が開放されます<span class="mut">('+locked.map(k=>esc(subjName(k,lp))).join('・')+')</span></li>';
+    h+='<li><b>レベルの上限なし</b> — おためし版は、実力判定の +2 レベルまでです</li>';
+    h+='<li><b>なかまは12人まで</b> — おためし版は2人までです</li>';
+    h+='<li><b>ずかんは24体</b> — おためし版は8体です</li>';
+    h+='<li><b>かぞく同期</b> — 複数の端末でデータを受け渡せます</li>';
+    h+='</ul>';
+    h+='<div class="mut" style="font-size:.74rem;margin:10px 0 12px">おためし版で遊んだ記録は、フル版に引きつぐことができます(かきだし→よみこみ)。</div>';
+    h+='<div style="text-align:center">'+(SHOP?'<a class="btn" href="'+esc(SHOP)+'" target="_blank" rel="noopener">フル版を見る</a>':'<span class="mut">(販売ページ準備中)</span>')+'</div>';
+    h+='<div style="text-align:center;margin-top:10px"><button class="btn ghost small" onclick="closeLock()">とじる</button></div>';
+    h+='</div></div>';
+   }
   }
   const unread=(p.inbox||[]).find(m=>!m.read);
   if(unread&&!V.gres){
@@ -1995,11 +2114,11 @@ function render(){
  else if(V.screen==='coll'){
   const p=S.profiles[V.pid];
   const owned=Object.keys(p.collection).length;
-  h+='<div class="top"><button class="btn ghost small" onclick="go(\'home\')">◀ もどる</button><h1>📖 なかまずかん</h1><div class="sp"></div><span class="pill">'+owned+'/'+GACHA.length+'</span></div>';
-  if(owned>=GACHA.length)h+='<div class="banner ok">🏆 ずかん コンプリート! きみは でんせつの コレクター!</div>';
+  h+='<div class="top"><button class="btn ghost small" onclick="go(\'home\')">◀ もどる</button><h1>📖 なかまずかん</h1><div class="sp"></div><span class="pill">'+owned+'/'+gachaPool().length+'</span></div>';
+  if(owned>=gachaPool().length)h+='<div class="banner ok">🏆 ずかん コンプリート! '+(LITE?'フルばんには 24たい いるよ!':'きみは でんせつの コレクター!')+'</div>';
   h+='<div class="card" style="padding:10px 14px"><div class="mut" style="font-size:.75rem">なかまを タップすると「きょうの おとも」になって、クエストに ついてきてくれるよ'+(p.buddy?'(いま: '+p.buddy+')':'')+'</div></div>';
   h+='<div class="grid">';
-  for(const g of GACHA){
+  for(const g of gachaPool()){
    const n=p.collection[g.e]||0;
    const isBud=p.buddy===g.e;
    if(n>0){
@@ -2036,7 +2155,7 @@ function render(){
   h+='<div class="top"><button class="btn ghost small" onclick="go(\'profiles\')">◀ とじる</button><h1>👪 おうちのかたメニュー</h1></div>';
   if(V.demo)h+='<div class="card" style="border-style:dashed;text-align:center"><span class="mut">📸 デモモード中</span> <button class="btn small" onclick="toggleDemo()">ふつうに もどす</button></div>';
   h+='<div class="card"><div class="row"><span class="pill">なかま '+S.order.length+'/12</span><div class="sp"></div>'
-   +(S.order.length<12?'<button class="btn small" onclick="startReg()">➕ なかまを ふやす</button>':'<span class="mut">上限に達しています</span>')+'</div></div>';
+   +(S.order.length<maxProfiles()?'<button class="btn small" onclick="startReg()">➕ なかまを ふやす</button>':'<span class="mut">'+(LITE?'おためし版は '+LITE_PROFILES+'人までです(フル版は12人)':'上限に達しています')+'</span>')+'</div></div>';
   for(const pid of S.order)h+=parentCard(pid);
   h+='<div class="card"><h2>かぞく設定</h2>'
    +'<label>かぞくのなまえ(タイトルに表示)</label><div class="row"><input type="text" id="famNm" value="'+esc((S.family&&S.family.name)||'')+'" maxlength="10" style="flex:1" placeholder="れい:やまだ"><button class="btn small" onclick="setFamily()">保存</button></div>'
@@ -2047,6 +2166,10 @@ function render(){
   h+='<div class="card"><h2>🔑 アプリのかぎ(ログイン)</h2><div class="mut" style="margin-bottom:8px">'
    +(S.appLock?'かかっています。ひらくまで なまえも記録も表示されません。':'かけると、起動時に えもじ3つの入力を求めます。共用の端末で なまえを隠したいときに。')+'</div>'
    +'<div style="text-align:center"><button class="btn ghost small" onclick="startAppLock()">'+(S.appLock?'かぎを かえる/けす':'かぎを かける')+'</button></div></div>';
+  if(LITE){
+   h+='<div class="card"><h2>☁️ かぞく同期</h2><div class="mut" style="font-size:.8rem;line-height:1.9">複数の端末でデータを受け渡す機能は、<b>フル版の機能</b>です。<br>おためし版でも、下の「かきだし」で控えを保存できます(フル版に引きつげます)。</div></div>';
+  }
+  else{
   h+='<div class="card"><h2>☁️ かぞく同期(ベータ)</h2>';
   if(!cloudAvail()){
    h+='<div class="mut">この機能は https で公開したページ(GitHub Pages版など)でのみ使えます。ファイルを直接開いている場合は使えません。</div>';
@@ -2095,7 +2218,8 @@ function render(){
   }
   if(V.cloudMsg)h+='<div class="mut" style="margin-top:8px;text-align:center;font-weight:700">'+esc(V.cloudMsg)+'</div>';
   h+='</div>';
-  h+='<div class="card"><h2>💾 バックアップ</h2><div class="mut" style="margin-bottom:8px">学習データはこの端末の中に保存されます(かぞく同期を使う場合も、暗号化された状態でのみ送られます)。ブラウザの履歴削除等で消えることがあるため、ときどき書き出して控えを残してください。</div>'
+  } /* /かぞく同期(フル版のみ) */
+  h+='<div class="card"><h2>💾 バックアップ</h2><div class="mut" style="margin-bottom:8px">'+(LITE?'学習データはこの端末の中だけに保存されます。ブラウザの履歴削除等で消えることがあるため、ときどき書き出して控えを残してください(フル版に引きつげます)。':'学習データはこの端末の中に保存されます(かぞく同期を使う場合も、暗号化された状態でのみ送られます)。ブラウザの履歴削除等で消えることがあるため、ときどき書き出して控えを残してください。')+'</div>'
    +'<div class="row"><button class="btn small" onclick="doExport()">📤 書き出す</button><button class="btn ghost small" onclick="V.screen=\'import\';V.ieMsg=\'\';render()">📥 読み込む</button></div></div>';
   h+='<div class="card"><h2>📸 デモモード</h2><div class="mut" style="margin-bottom:8px">記事や商品画像の撮影用に、実データに触れずダミーの画面に切り替えます。</div>'
    +'<div style="text-align:center"><button class="btn ghost small" onclick="toggleDemo()">'+(V.demo?'デモを おわる':'デモモードに する')+'</button></div></div>';
@@ -2802,7 +2926,7 @@ function updateProfileData(id,pr){
  return null;
 }
 function mergeProfile(pr){
- if(S.order.length>=12)return 'この端末は なかまが上限(12人)です';
+ if(S.order.length>=maxProfiles())return LITE?('おためし版は なかまが '+LITE_PROFILES+'人までです'):'この端末は なかまが上限(12人)です';
  const np=JSON.parse(JSON.stringify(pr));
  // 同名がいたら「②」を付けて区別(データは別人として保持)
  let nm=np.name;
